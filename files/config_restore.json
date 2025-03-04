@@ -1,0 +1,17 @@
+{
+    "memory": [], 
+    "instruction": "", 
+    "parameters": {
+        "temperature": 1.5, 
+        "min_p": 0.5
+    },
+    "messages": {
+        "last_message": {
+            "id": 0, 
+            "text": ""
+        }
+    },
+    "history": true, 
+    "admin": -1, 
+    "token": ""
+}
