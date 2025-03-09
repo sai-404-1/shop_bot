@@ -1,7 +1,7 @@
 from aiogram.utils.keyboard import InlineKeyboardBuilder, ReplyKeyboardBuilder, InlineKeyboardMarkup
 from aiogram.types import InlineKeyboardButton, KeyboardButton
 
-from buttons import *
+from .buttons import *
 from starter import *
 
 def categories():
@@ -13,7 +13,7 @@ def categories():
         )
     return builder.as_markup()
 
-def createCustomKeyboard(buttons: list[Button]) -> InlineKeyboardMarkup|ReplyKeyboardMarkup:
+def createCustomKeyboard(buttons: list[Button]) -> InlineKeyboardMarkup|InlineKeyboardMarkup:
     keyboard = InlineKeyboardBuilder() if inline else ReplyKeyboardBuilder()
 
     for buttonData in buttons:

@@ -1,4 +1,4 @@
-from manager.db_manager import Database
+from manager.base import *
 import manager.templates as templates
 
 from aiogram import Bot, Dispatcher, types
@@ -7,6 +7,8 @@ from aiogram.types import Message
 
 # Инициализация бота и диспетчера
 TOKEN = "8107506318:AAEdGyBoDxqXKMwxDdPezJ3lmv7KS_2ccbY" #manager.get_token()
+db_session = Database('database.db').Session()
+
 bot = Bot(token=TOKEN)
 dp = Dispatcher()
 
