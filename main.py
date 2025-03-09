@@ -1,5 +1,5 @@
-import inline_buttons.keyboardFabric as keyboardFabric
-import inline_buttons.callbacks as inline_callbacks
+import keyboards.keyboardFabric as keyboardFabric
+import keyboards.callbacks as inline_callbacks
 
 from starter import *
 
