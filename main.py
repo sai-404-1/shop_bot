@@ -12,6 +12,8 @@ async def all_messages(message: Message):
     await message.answer('пиши /start, дэбик')
 
 
+
 if __name__ == "__main__":
     import asyncio
+    # function main is declared in starter.py
     asyncio.run(main())

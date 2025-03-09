@@ -1,0 +1,74 @@
+{
+    "start_message": "OniChan магазин техники\nг.Ставрополь\n-Trade-in / рассрочка / кредит\n- Покупка / продажа новых и б/у устройств\n- ремонт\n- аксессуары",
+
+    "main_buttons": [
+        ["Меню", "menu"],
+        ["Корзина", "basket"]
+    ],
+
+    "categories": [
+        ["Телефоны", "phones"],
+        ["Чехлы", "cases"]
+    ],
+
+    "menu_buttons": [
+        ["Новые устройства", "new_devices"],
+        ["Б/у устройства", "used_devices"],
+        ["Красота", "beauty"],
+        ["Игровые приставки", "game_consoles"],
+        ["Аксессуары", "accessories"],
+        ["Корзина", "basket"],
+        ["Связь с менеджером", "manager"],
+        ["Домой", "start"],
+        ["Доставка / оплата", "delivery"]
+    ],
+
+    "new_devices": [
+        ["Смартфоны", "smartphones"],
+        ["Планшеты", "tablets"],
+        ["Ноутбуки", "notebooks"],
+        ["Часы", "watches"],
+        ["Наушники", "headphones"],
+        ["Связь с менеджером", "manager"],
+        ["Домой", "start"],
+        ["Доставка / оплата", "delivery"]
+    ],
+    
+    "used_devices": [
+        ["Смартфоны", "smartphones"],
+        ["Планшеты", "tablets"],
+        ["Ноутбуки", "notebooks"],
+        ["Часы", "watches"],
+        ["Наушники", "headphones"],
+        ["Связь с менеджером", "manager"],
+        ["Домой", "start"],
+        ["Доставка / оплата", "delivery"]
+    ],
+
+    "beauty": [
+        ["Стайлеры dyson со всем перечнем товара", "dyson_styler"],
+        ["Выпрямители dyson со всем перечнем товара", "dyson_straightener"],
+        ["Фен dyson со всем перечнем товара", "dyson_hair_dryer"]
+    ],
+
+    "game_consoles": [
+        ["PS", "ps"],
+        ["X-box", "xbox"]
+    ],
+
+    "accessories": [
+        ["Зарядные устройства", "chargers"],
+        ["Чехлы", "cases"],
+        ["Стекла", "glasses"],
+        ["Колонки", "speakers"],
+        ["и т.д.", "etc"]
+    ],
+
+    "smartphones": [
+        ["Apple", "apple"],
+        ["Андроид", "amdroid"],
+        ["Связь с менеджером", "manager"],
+        ["Домой", "start"],
+        ["Доставка / оплата", "delivery"]
+    ]
+}
