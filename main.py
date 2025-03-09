@@ -1,11 +1,11 @@
-import inline_buttons.buttons as inline_buttons
+import inline_buttons.keyboardFabric as keyboardFabric
 import inline_buttons.callbacks as inline_callbacks
 
 from starter import *
 
 @dp.message(Command("start"))
 async def cmd_start(message: Message):
-    await message.answer(templates.start_message, reply_markup=inline_buttons.categories())
+    await message.answer(templates.start_message, reply_markup=keyboardFabric.categories())
 
 @dp.message()
 async def all_messages(message: Message):
