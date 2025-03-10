@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Float, Text, ForeignKey
+from sqlalchemy import Column, Integer, String, Float, Text, ForeignKey, JSON
 from sqlalchemy.orm import declarative_base, relationship
 Base = declarative_base()
 # from .crud import CRUD
@@ -8,8 +8,9 @@ class Product(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String, nullable=False)
     description = Column(String, nullable=False)
+    photo = Column(String, nullable=True)
     price = Column(Float, nullable=False)
-    type_id = Column(Integer, ForeignKey("type.id"), nullable=True)  # Внешний ключ
+    type_id = Column(Integer, ForeignKey("type.id"), nullable=True)
 
 class Type(Base):
     __tablename__ = "type"
