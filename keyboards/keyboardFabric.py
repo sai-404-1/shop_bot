@@ -1,5 +1,5 @@
 from aiogram.utils.keyboard import InlineKeyboardBuilder, ReplyKeyboardBuilder, InlineKeyboardMarkup
-from aiogram.types import InlineKeyboardButton, KeyboardButton
+from aiogram.types import InlineKeyboardButton, KeyboardButton, ReplyKeyboardMarkup
 
 from .buttons import *
 from starter import *
@@ -13,11 +13,20 @@ def categories():
         )
     return builder.as_markup()
 
-def createCustomKeyboard(buttons: list[Button]) -> InlineKeyboardMarkup|InlineKeyboardMarkup:
-    keyboard = InlineKeyboardBuilder() if inline else ReplyKeyboardBuilder()
+def createCustomInlineKeyboard(buttons: list[Button]) -> InlineKeyboardMarkup:
+    keyboard = InlineKeyboardBuilder()
+
+    for buttonData in buttons:
+        button = buttonData.create()
+        keyboard.row(button)
+    
+    return keyboard.as_markup()
+
+def createCustomReplyKeyboard(buttons: list[Button]) -> ReplyKeyboardMarkup:
+    keyboard = ReplyKeyboardBuilder()
 
     for buttonData in buttons:
         button = buttonData.create()
         keyboard.add(button)
     
-    return keyboard.as_markup()
+    return keyboard.as_markup(resize_keyboard=True)

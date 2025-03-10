@@ -1,9 +1,16 @@
 {
-    "messages_texts": {
-        "start_message": "OniChan магазин техники\nг.Ставрополь\n-Trade-in / рассрочка / кредит\n- Покупка / продажа новых и б/у устройств\n- ремонт\n- аксессуары"
+    "message_texts": {
+        "main": "OniChan магазин техники\nг.Ставрополь\n-Trade-in / рассрочка / кредит\n- Покупка / продажа новых и б/у устройств\n- ремонт\n- аксессуары",
+        "NaN": "Not a Message"
     },
 
-    "main_buttons": [
+    "NaN": [
+        ["NaN", "NaN"],
+        ["NaN", "NaN"],
+        ["NaN", "NaN"]
+    ],
+
+    "main": [
         ["Меню", "menu"],
         ["Корзина", "basket"]
     ],
@@ -13,7 +20,7 @@
         ["Чехлы", "cases"]
     ],
 
-    "menu_buttons": [
+    "menu": [
         ["Новые устройства", "new_devices"],
         ["Б/у устройства", "used_devices"],
         ["Красота", "beauty"],
