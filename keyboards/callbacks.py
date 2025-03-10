@@ -1,6 +1,8 @@
 from starter import *
 
+import re
 from aiogram import F
+import os
 from .buttons import *
 import keyboards.keyboardFabric as keyboardFabric
 import keyboards.messageGenerator as messageGenerator
@@ -35,3 +37,19 @@ async def send_generated_message(callback):
 ]))
 async def regenerate_button_callback(callback: types.CallbackQuery):
     await send_generated_message(callback)
+
+# изменил template.json добавив обработку кнопки "Домой" 
+@dp.callback_query(F.data == "start")
+async def home(callback: types.CallbackQuery):
+    await send_generated_message(callback)
+
+# TODO Надо переписать код так, чтобы он обрабатывал любые значения, а не только iphone
+@dp.callback_query(lambda c: re.match(r'^iphone', c.data))
+async def process_callback(callback: types.CallbackQuery):
+    iphone = CRUD.for_model(Product).get(db_session, id=int(callback.data.replace("iphone", "")))[0]
+    await callback.message.answer_photo(
+        types.FSInputFile(
+            f"{photo_path}/{iphone.photo}"
+        ),
+        caption="{}\n\n{}\n\n{}".format(iphone.name, iphone.description, iphone.price)
+    )

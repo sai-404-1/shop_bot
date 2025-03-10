@@ -8,6 +8,7 @@ from aiogram.types import Message
 # Инициализация бота и диспетчера
 TOKEN = "8107506318:AAEdGyBoDxqXKMwxDdPezJ3lmv7KS_2ccbY" #manager.get_token()
 db_session = Database('database.db').Session()
+photo_path = "src/photo"
 
 bot = Bot(token=TOKEN)
 dp = Dispatcher()

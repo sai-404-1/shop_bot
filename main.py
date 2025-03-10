@@ -16,10 +16,18 @@ async def cmd_start(message: Message):
 
     await message.answer(message_text, reply_markup=keyboardFabric.createCustomInlineKeyboard(buttons))
 
+@dp.message(Command("apple"))
+async def apple(message: Message):
+    phones = CRUD.for_model(Product).get(db_session, type_id=1)
+    buttons = []
+    for phone in phones:
+        buttons.append(button_types.InlineButton(phone.name, "iphone" + str(phone.id)))
+
+    await message.answer("Смартфоны Apple", reply_markup=keyboardFabric.createCustomInlineKeyboard(buttons))
+
 @dp.message()
 async def all_messages(message: Message):
     await message.answer('пиши /start, дэбик')
-
 
 
 if __name__ == "__main__":
