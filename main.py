@@ -22,7 +22,6 @@ async def apple(message: Message):
     buttons = []
     for phone in phones:
         buttons.append(button_types.InlineButton(phone.name, "iphone" + str(phone.id)))
-
     await message.answer("Смартфоны Apple", reply_markup=keyboardFabric.createCustomInlineKeyboard(buttons))
 
 @dp.message()
