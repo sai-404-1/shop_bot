@@ -11,7 +11,7 @@ async def cmd_start(message: Message):
     dataset = Json.getMainDataset()
     message_text = dataset["message_texts"]["main"]
     buttons = []
-    for button_data in dataset["main"]   :
+    for button_data in dataset["main"]:
         buttons.append(button_types.InlineButton(button_data[0], button_data[1]))
 
     await message.answer(message_text, reply_markup=keyboardFabric.createCustomInlineKeyboard(buttons))
