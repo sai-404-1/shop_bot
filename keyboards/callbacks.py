@@ -30,17 +30,14 @@ async def send_generated_message(callback):
         reply_markup = mg.getInlineKeyboard()
     )
 
+# you change start to main in templates.json 
+# "домой" have action "main"
 @dp.callback_query(F.data.in_([
     "main", "categories", "menu", "new_devices",
     "used_devices", "beauty", "game_consoles",
     "accessories", "smartphones"
 ]))
 async def regenerate_button_callback(callback: types.CallbackQuery):
-    await send_generated_message(callback)
-
-# изменил template.json добавив обработку кнопки "Домой" 
-@dp.callback_query(F.data == "start")
-async def home(callback: types.CallbackQuery):
     await send_generated_message(callback)
 
 @dp.callback_query(F.data == "apple")
