@@ -24,7 +24,7 @@ class Basket(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     products_id = Column(Integer, ForeignKey("products.id"), nullable=False)
-    quantity = Column(Integer, nullable=False)
+    quantity = Column(Integer, default=1)
 
 class Product(Base):
     __tablename__ = "products"
@@ -34,6 +34,7 @@ class Product(Base):
     photo = Column(String, nullable=True)
     price = Column(Float, nullable=False)
     type_id = Column(Integer, ForeignKey("type.id"), nullable=True)
+    quantity = Column(Integer, default=1)
 
 class Type(Base):
     __tablename__ = "type"

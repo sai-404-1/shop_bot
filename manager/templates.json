@@ -15,11 +15,6 @@
         ["Корзина", "basket"]
     ],
 
-    "categories": [
-        ["Телефоны", "phones"],
-        ["Чехлы", "cases"]
-    ],
-
     "menu": [
         ["Новые устройства", "new_devices"],
         ["Б/у устройства", "used_devices"],
