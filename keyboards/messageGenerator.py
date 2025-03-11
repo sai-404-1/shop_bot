@@ -36,3 +36,22 @@ class MessageGenerator:
         TODO: add this function
         """
         pass
+
+class TextGenerator:
+    def __init__(self, data):
+        self.data = data
+        self.buttonTexts = Json.getButtonPartsDataset()
+        self.messageDataset = Json.getMessagePartsDataset()
+    
+    def getButtonPart(self):
+        try:
+            return self.buttonTexts[self.data]
+        except:
+            return self.buttonTexts["NaN"]
+    
+    def getMessagePart(self):
+        try:
+            return self.messageDataset[self.data]
+        except:
+            return self.messageDataset["NaN"]
+            

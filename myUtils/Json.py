@@ -9,3 +9,9 @@ def jsonParser(jsonFileName):
 
 def getMainDataset():
     return jsonParser(myConstants.CONSTANTS.MAIN_DATASET_PATH)
+
+def getMessagePartsDataset():
+    return jsonParser(myConstants.CONSTANTS.MESSAGE_PARTS_DATASET_PATH)
+
+def getButtonPartsDataset():
+    return jsonParser(myConstants.CONSTANTS.BUTTON_PARTS_DATASET_PATH)
