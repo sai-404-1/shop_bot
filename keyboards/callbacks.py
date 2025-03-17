@@ -29,7 +29,7 @@ async def regenerate_button_callback(callback: types.CallbackQuery):
 
 @dp.callback_query(F.data.in_([
     "apple", "android", 
-    "chargers", "cases","glasses", "speakers", 
+    "chargers", "cases","glasses", "speakers", "etc",
     "ps", "xbox",
     "dyson_styler", "dyson_straightener", "dyson_hair_dryer",
     "tablets", "notebooks", "watches", "headphones",
@@ -43,12 +43,13 @@ async def apple(callback: types.CallbackQuery):
     tg = messageGenerator.TextGenerator(callback.data)
 
     for phone in phones:
-        buttons.append(InlineButton(phone.name, tg.getButtonPart() + str(phone.id)))
+        buttons.append(InlineButton(phone.name, "\pupupu/" + tg.getButtonPart() + str(phone.id)))
     await callback.message.edit_text(tg.getMessagePart(), reply_markup=keyboardFabric.createCustomInlineKeyboard(buttons))
 
 
 # TODO Надо переписать код так, чтобы он обрабатывал любые значения, а не только iphone
-@dp.callback_query(lambda c: re.match(r'^iphone', c.data))
+# @dp.callback_query(lambda c: re.match(r'^iphone', c.data))
+@dp.callback_query(lambda c: "\pupupu/" in c.data) # меточки для обработки
 async def process_callback(callback: types.CallbackQuery):
     iphone = CRUD.for_model(Product).get(db_session, id=int(callback.data.replace("iphone", "")))[0]
     await callback.message.answer_photo(
