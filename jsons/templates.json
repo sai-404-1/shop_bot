@@ -75,7 +75,7 @@
     ],
 
     "smartphones": [
-        ["Apple", "apple"],
+        ["IPhone", "iphone"],
         ["Андроид", "android"],
         ["Связь с менеджером", "manager"],
         ["Домой", "main"],

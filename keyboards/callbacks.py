@@ -24,13 +24,9 @@ async def send_generated_message(callback):
 async def regenerate_button_callback(callback: types.CallbackQuery):
     await send_generated_message(callback)
 
-@dp.callback_query(F.data.in_([
-    "apple", "android", 
-    "chargers", "cases","glasses", "speakers", "etc",
-    "ps", "xbox",
-    "dyson_styler", "dyson_straightener", "dyson_hair_dryer",
-    "tablets", "notebooks", "watches", "headphones",
-]))
+@dp.callback_query(F.data.in_(
+    [obj.name for obj in CRUD.for_model(Type).get(db_session)]
+))
 async def product_type_handler(callback: types.CallbackQuery):
     # TODO: add state machine for new_devices/used_devices
     type_id = CRUD.for_model(Type).get(db_session, name=callback.data)[0].id
