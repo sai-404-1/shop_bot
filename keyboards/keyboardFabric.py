@@ -4,6 +4,7 @@ from aiogram.types import InlineKeyboardButton, KeyboardButton, ReplyKeyboardMar
 from .buttons import *
 from starter import *
 
+# NEED TO CHECK, MAYBE THIS FUNCTION IS NOT USED
 def categories():
     builder = InlineKeyboardBuilder()
     for categorie in templates.categories:
@@ -30,3 +31,12 @@ def createCustomReplyKeyboard(buttons: list[Button]) -> ReplyKeyboardMarkup:
         keyboard.add(button)
     
     return keyboard.as_markup(resize_keyboard=True)
+
+# Special cases
+def createKeyboardWithBackButton(buttons: list[Button], backAction: str) -> InlineKeyboardMarkup:
+    buttons.append(
+        InlineButton('Назад', backAction)
+    )
+    return createCustomInlineKeyboard(buttons)
+
+# def CreateBasketKeyboard

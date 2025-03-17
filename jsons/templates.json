@@ -39,22 +39,22 @@
     ],
 
     "new_devices": [
-        ["Смартфоны", "smartphones"],
-        ["Планшеты", "tablets"],
-        ["Ноутбуки", "notebooks"],
-        ["Часы", "watches"],
-        ["Наушники", "headphones"],
+        ["Смартфоны", "new_smartphones"],
+        ["Планшеты", "new_tablets"],
+        ["Ноутбуки", "new_notebooks"],
+        ["Часы", "new_watches"],
+        ["Наушники", "new_headphones"],
         ["Связь с менеджером", "manager"],
         ["Домой", "main"],
         ["Доставка / оплата", "delivery"]
     ],
     
     "used_devices": [
-        ["Смартфоны", "smartphones"],
-        ["Планшеты", "tablets"],
-        ["Ноутбуки", "notebooks"],
-        ["Часы", "watches"],
-        ["Наушники", "headphones"],
+        ["Смартфоны", "used_smartphones"],
+        ["Планшеты", "used_tablets"],
+        ["Ноутбуки", "used_notebooks"],
+        ["Часы", "used_watches"],
+        ["Наушники", "used_headphones"],
         ["Связь с менеджером", "manager"],
         ["Домой", "main"],
         ["Доставка / оплата", "delivery"]
@@ -79,9 +79,17 @@
         ["и т.д.", "etc"]
     ],
 
-    "smartphones": [
-        ["IPhone", "iphone"],
-        ["Андроид", "android"],
+    "new_smartphones": [
+        ["IPhone", "new_iphone"],
+        ["Андроид", "new_android"],
+        ["Связь с менеджером", "manager"],
+        ["Домой", "main"],
+        ["Доставка / оплата", "delivery"]
+    ],
+
+    "used_smartphones": [
+        ["IPhone", "used_iphone"],
+        ["Андроид", "used_android"],
         ["Связь с менеджером", "manager"],
         ["Домой", "main"],
         ["Доставка / оплата", "delivery"]

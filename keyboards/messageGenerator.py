@@ -22,13 +22,28 @@ class MessageGenerator:
             return self.dataset[self.data]
         except:
             return self.dataset["NaN"]
-    
+
+    def findBackAction(self) -> str:
+        for key in self.dataset:
+            try:
+                value = self.dataset[key]
+                actions = [v[1] for v in value]
+                if self.data in actions:
+                    return key
+            except:
+                pass
+        return None
+
     def getInlineKeyboard(self) -> InlineKeyboardMarkup:
         buttons = []
+        backAction = self.findBackAction()
         for button_data in self.getButtons():
             buttons.append(InlineButton(button_data[0], button_data[1]))
-        
-        return keyboardFabric.createCustomInlineKeyboard(buttons)
+        # TODO: add condition: if getBackAction is not None -> create back button : if it is None -> not create custom keyboard
+        if self.data == "main" or backAction is None:
+            return keyboardFabric.createCustomInlineKeyboard(buttons)
+        else:
+            return keyboardFabric.createKeyboardWithBackButton(buttons, backAction)
     
     def getReplyKeyboard(self) -> ReplyKeyboardMarkup:
         """
