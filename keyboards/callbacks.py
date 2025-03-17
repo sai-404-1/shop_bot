@@ -43,7 +43,7 @@ async def product_type_handler(callback: types.CallbackQuery):
     str(product.id) for product in CRUD.for_model(Product).all(db_session)
 ]))
 async def process_callback(callback: types.CallbackQuery):
-    object = CRUD.for_model(Product).get(db_session, type_id=int(callback.data))[0]
+    object = CRUD.for_model(Product).get(db_session, id=int(callback.data))[0]
     await callback.message.answer_photo(
         types.FSInputFile(
             f"{photo_path}/{object.photo}"
