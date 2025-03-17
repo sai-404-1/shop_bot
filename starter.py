@@ -21,4 +21,4 @@ async def main():
     await dp.start_polling(bot)
 
 if __name__ == "__main__":
-    from manager import db_test
+    from manager import for_restore

@@ -16,8 +16,6 @@ async def send_generated_message(callback):
         reply_markup = mg.getInlineKeyboard()
     )
 
-# you change start to main in templates.json 
-# "домой" have action "main"
 @dp.callback_query(F.data.in_([
     "main", "categories", "menu", "new_devices",
     "used_devices", "beauty", "game_consoles",
@@ -33,27 +31,28 @@ async def regenerate_button_callback(callback: types.CallbackQuery):
     "dyson_styler", "dyson_straightener", "dyson_hair_dryer",
     "tablets", "notebooks", "watches", "headphones",
 ]))
-async def apple(callback: types.CallbackQuery):
+async def product_type_handler(callback: types.CallbackQuery):
     # TODO: add state machine for new_devices/used_devices
     type_id = CRUD.for_model(Type).get(db_session, name=callback.data)[0].id
     phones = CRUD.for_model(Product).get(db_session, type_id=type_id)
     buttons = []
-
     tg = messageGenerator.TextGenerator(callback.data)
 
     for phone in phones:
-        buttons.append(InlineButton(phone.name, "\pupupu/" + tg.getButtonPart() + str(phone.id)))
+        buttons.append(InlineButton(phone.name, str(phone.id)))
     await callback.message.edit_text(tg.getMessagePart(), reply_markup=keyboardFabric.createCustomInlineKeyboard(buttons))
 
 
-# TODO Надо переписать код так, чтобы он обрабатывал любые значения, а не только iphone
-# @dp.callback_query(lambda c: re.match(r'^iphone', c.data))
-@dp.callback_query(lambda c: "\pupupu/" in c.data) # меточки для обработки
+# Логика следующая: при создании списка товаров, кнопкам присваиваются callback'и, которые состоят лишь из id товара, 
+# что позволяет контролировать какой товар вызывается по нажатию.
+@dp.callback_query(F.data.in_([
+    str(product.id) for product in CRUD.for_model(Product).all(db_session)
+]))
 async def process_callback(callback: types.CallbackQuery):
-    iphone = CRUD.for_model(Product).get(db_session, id=int(callback.data))[0]
+    object = CRUD.for_model(Product).get(db_session, type_id=int(callback.data))[0]
     await callback.message.answer_photo(
         types.FSInputFile(
-            f"{photo_path}/{iphone.photo}"
+            f"{photo_path}/{object.photo}"
         ),
-        caption="{}\n\n{}\n\n{}".format(iphone.name, iphone.description, iphone.price)
+        caption="{}\n\n{}\n\n{}".format(object.name, object.description, object.price)
     )

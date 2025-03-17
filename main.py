@@ -20,7 +20,7 @@ async def cmd_start(message: Message):
     else: user = user[0]
     
     buttons = []
-    for button_data in dataset["main"] if user.role == 1 else dataset["main"][:2]:
+    for button_data in dataset["main"] if user.role >= 1 else dataset["main"][:2]:
         buttons.append(button_types.InlineButton(button_data[0], button_data[1]))
 
     await message.answer(
