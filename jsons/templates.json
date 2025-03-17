@@ -12,7 +12,13 @@
 
     "main": [
         ["Меню", "menu"],
-        ["Корзина", "basket"]
+        ["Корзина", "basket"],
+        ["Работа с базой", "database_change"]
+    ],
+
+    "database_change": [
+        ["Добавить товар", "create_product"],
+        ["Изменить товар", "change_product"]
     ],
 
     "menu": [
@@ -74,5 +80,10 @@
         ["Связь с менеджером", "manager"],
         ["Домой", "main"],
         ["Доставка / оплата", "delivery"]
+    ],
+
+    "products": [
+        ["Добавить в корзину", "basket_create"],
+        ["К товарам в категории", "open_last_category"]
     ]
 }

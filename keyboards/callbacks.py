@@ -1,7 +1,6 @@
 from starter import *
 
 import re
-from aiogram import F
 import os
 from .buttons import *
 import keyboards.keyboardFabric as keyboardFabric
@@ -51,7 +50,7 @@ async def apple(callback: types.CallbackQuery):
 # @dp.callback_query(lambda c: re.match(r'^iphone', c.data))
 @dp.callback_query(lambda c: "\pupupu/" in c.data) # меточки для обработки
 async def process_callback(callback: types.CallbackQuery):
-    iphone = CRUD.for_model(Product).get(db_session, id=int(callback.data.replace("iphone", "")))[0]
+    iphone = CRUD.for_model(Product).get(db_session, id=int(callback.data))[0]
     await callback.message.answer_photo(
         types.FSInputFile(
             f"{photo_path}/{iphone.photo}"

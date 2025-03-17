@@ -1,5 +1,6 @@
 import keyboards.keyboardFabric as keyboardFabric
 import keyboards.callbacks as inline_callbacks
+import manager.fsm.fsm_handler as fsm_handler
 import keyboards.buttons as button_types
 
 import myUtils.Json as Json
@@ -9,25 +10,23 @@ from starter import *
 @dp.message(Command("start"))
 async def cmd_start(message: Message):
     dataset = Json.getMainDataset()
-    message_text = dataset["message_texts"]["main"]
+    user = CRUD.for_model(Users).get(db_session, user_id=message.from_user.id)
+    
+    if len(user) == 0:
+        user = CRUD.for_model(Users).create(db_session, 
+            username=message.from_user.username, 
+            user_id=message.from_user.id
+        )
+    else: user = user[0]
+    
     buttons = []
-    for button_data in dataset["main"]:
+    for button_data in dataset["main"] if user.role == 1 else dataset["main"][:2]:
         buttons.append(button_types.InlineButton(button_data[0], button_data[1]))
 
-    await message.answer(message_text, reply_markup=keyboardFabric.createCustomInlineKeyboard(buttons))
-
-@dp.message(Command("apple"))
-async def apple(message: Message):
-    phones = CRUD.for_model(Product).get(db_session, type_id=1)
-    buttons = []
-    for phone in phones:
-        buttons.append(button_types.InlineButton(phone.name, "iphone" + str(phone.id)))
-    await message.answer("Смартфоны Apple", reply_markup=keyboardFabric.createCustomInlineKeyboard(buttons))
-
-@dp.message()
-async def all_messages(message: Message):
-    await message.answer('пиши /start, дэбик')
-
+    await message.answer(
+        text=dataset["message_texts"]["main"],
+        reply_markup=keyboardFabric.createCustomInlineKeyboard(buttons)
+    )
 
 if __name__ == "__main__":
     import asyncio

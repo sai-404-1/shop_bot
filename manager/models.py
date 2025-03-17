@@ -13,6 +13,7 @@ class Users(Base):
     __tablename__ = "users"
     id = Column(Integer, primary_key=True, autoincrement=True)
     username = Column(String, nullable=False)
+    user_id = Column(Integer, nullable=False)
     role = Column(Integer, default=0)  
     
 class Basket(Base):
@@ -47,7 +48,3 @@ class TextContent(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     name_en = Column(String, nullable=False)
     text_content = Column(Text, nullable=False)
-
-    
-if __name__ == "__main__":
-    Product.create()
