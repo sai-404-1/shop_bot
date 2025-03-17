@@ -1,7 +1,7 @@
 # к чёрту эту дрянь
 .DS_Store
 test.py
-# manager/db_test.py
+manager/db_test.py
 src/database.db
 
 

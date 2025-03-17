@@ -7,7 +7,7 @@ import myUtils.Json as Json
 
 from starter import *
 
-@dp.message(Command("start"))
+@dp.message(CommandStart())
 async def cmd_start(message: Message):
     dataset = Json.getMainDataset()
     user = CRUD.for_model(Users).get(db_session, user_id=message.from_user.id)
@@ -27,6 +27,10 @@ async def cmd_start(message: Message):
         text=dataset["message_texts"]["main"],
         reply_markup=keyboardFabric.createCustomInlineKeyboard(buttons)
     )
+
+# @fsm_router.message(StatesForCreate.product_name)
+# async def message_try(message: Message, state: FSMContext):
+#     await message.answer(f'Отработка состояния: {StatesForCreate.product_name}')
 
 if __name__ == "__main__":
     import asyncio

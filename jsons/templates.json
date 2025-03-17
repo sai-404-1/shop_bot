@@ -17,7 +17,12 @@
     ],
 
     "database_change": [
-        ["Добавить товар", "create_product"],
+        ["Товары", "admin_menu_products"],
+        ["Категории/типы", "admin_menu_types"]
+    ],
+
+    "admin_menu_products": [
+        ["Создать товар", "create_product"],
         ["Изменить товар", "change_product"]
     ],
 
