@@ -75,6 +75,23 @@ async def change_quantity(callback: types.CallbackQuery, state: FSMContext):
     await callback.message.answer("Введите новое кол-во товара\nМаксимум: {}".format(data["maxQuantity"]))
     await state.set_state(StatesForButtons.ready_to_enter_new_quantity)
 
+@dp.callback_query(
+    F.data == "add_to_basket"
+)
+async def add_to_basket(callback: types.CallbackQuery, state: FSMContext):
+    user_id = callback.from_user.id
+    product_id = (await state.get_data())["productId"]
+    quantity = (await state.get_data())["currQuantity"]
+    basket = CRUD.for_model(Basket).get(db_session, user_id=user_id, products_id=product_id)
+    if basket:
+        basket = basket[0]
+        CRUD.for_model(Basket).update(db_session, basket.id, quantity=quantity)
+    else:
+        CRUD.for_model(Basket).create(db_session, user_id=user_id, products_id=product_id, quantity=quantity)
+    
+    await callback.message.delete()
+    # TODO: do it
+    # await callback.message.answer("Товар успешно добавлен в корзину", reply_markup=await keyboardFabric.createAfterBasketKeyboard(state))
 
 @dp.callback_query(F.data == "create_product")
 async def db_changer(callback: types.CallbackQuery, state: FSMContext):

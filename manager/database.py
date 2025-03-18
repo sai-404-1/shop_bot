@@ -133,7 +133,7 @@ class Database:
             return False
 
     # Basket methods
-    def add_basket_position(user_id: int, product_id: int, quantity: int):
+    def add_basket_position(self, user_id: int, product_id: int, quantity: int):
         """
         add/change position in basket
         """
@@ -146,7 +146,7 @@ class Database:
                 basket_position.quantity = quantity
                 session.commit()
         
-    def get_all_basket_positions(user_id: int) -> list:
+    def get_all_basket_positions(self, user_id: int) -> list:
         """
         get all positions in basket
         returnable type: list<list<int>>
