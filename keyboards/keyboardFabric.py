@@ -21,7 +21,7 @@ def createCustomInlineKeyboard(buttons: list[Button]) -> InlineKeyboardMarkup:
     for buttonData in buttons:
         button = buttonData.create()
         keyboard.row(button)
-    
+    print(keyboard)
     return keyboard.as_markup()
 
 def createCustomReplyKeyboard(buttons: list[Button]) -> ReplyKeyboardMarkup:
