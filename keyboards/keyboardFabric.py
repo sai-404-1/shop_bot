@@ -59,3 +59,17 @@ async def createBeforeBasketKeyboard(state: FSMContext) -> InlineKeyboardMarkup:
     print(f"BACK ACTION: {backAction}")
 
     return createKeyboardWithBackButton(buttons, backAction)
+
+async def createAfterBasketKeyboard(state: FSMContext) -> InlineKeyboardMarkup:
+    data = await state.get_data()
+    buttons = []
+    buttons.append(InlineButton("В корзину", "basket"))
+    buttons.append(InlineButton("В меню", "menu"))
+
+    # еще немного копипасты
+    product = CRUD.for_model(Product).get(db_session, id=int(data["productId"]))[0]
+    typeId = product.type_id
+    productType = CRUD.for_model(Type).get(db_session, id=typeId)[0]
+    backAction = productType.name
+    
+    return createKeyboardWithBackButton(buttons, backAction)

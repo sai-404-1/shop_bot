@@ -4,6 +4,8 @@ from .buttons import *
 import keyboards.keyboardFabric as keyboardFabric
 import keyboards.messageGenerator as messageGenerator
 
+from myUtils import Json
+
 async def send_generated_message(callback):
     data = callback.data
     mg = messageGenerator.MessageGenerator(data)
@@ -38,11 +40,26 @@ async def product_type_handler(callback: types.CallbackQuery):
     for phone in phones:
         buttons.append(InlineButton(phone.name, str(phone.id)))
     
+    backAction = "pupupu"
+    dataset = Json.getMainDataset()
+    
+    for key in dataset:
+        try:
+            value = dataset[key]
+            actions = [v[1] for v in value]
+            if callback.data in actions:
+                backAction = key
+                break
+        except:
+            pass
+
+    print(backAction)
+
     if callback.message.photo:
         await callback.message.delete()
-        await callback.message.answer(tg.getMessagePart(), reply_markup=keyboardFabric.createCustomInlineKeyboard(buttons))
+        await callback.message.answer(tg.getMessagePart(), reply_markup=keyboardFabric.createKeyboardWithBackButton(buttons, backAction))
     else:
-        await callback.message.edit_text(tg.getMessagePart(), reply_markup=keyboardFabric.createCustomInlineKeyboard(buttons))
+        await callback.message.edit_text(tg.getMessagePart(), reply_markup=keyboardFabric.createKeyboardWithBackButton(buttons, backAction))
 
 @dp.callback_query(F.data.in_([
     str(product.id) for product in CRUD.for_model(Product).all(db_session)
@@ -90,8 +107,7 @@ async def add_to_basket(callback: types.CallbackQuery, state: FSMContext):
         CRUD.for_model(Basket).create(db_session, user_id=user_id, products_id=product_id, quantity=quantity)
     
     await callback.message.delete()
-    # TODO: do it
-    # await callback.message.answer("Товар успешно добавлен в корзину", reply_markup=await keyboardFabric.createAfterBasketKeyboard(state))
+    await callback.message.answer("Товар успешно добавлен в корзину", reply_markup=await keyboardFabric.createAfterBasketKeyboard(state))
 
 @dp.callback_query(F.data == "create_product")
 async def db_changer(callback: types.CallbackQuery, state: FSMContext):
