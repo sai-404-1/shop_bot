@@ -8,3 +8,6 @@ class StatesForCreate(StatesGroup):
     product_photo = State()
     product_type = State()
     product_quantity = State()
+
+class StatesForButtons(StatesGroup):
+    ready_to_enter_new_quantity = State()

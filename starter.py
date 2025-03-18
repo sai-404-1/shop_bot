@@ -1,6 +1,6 @@
 from manager.base import *
 import manager.templates as templates
-from manager.fsm.fsm_class import StatesForCreate
+from manager.fsm.fsm_class import StatesForCreate, StatesForButtons
 from keyboards import keyboardFabric
 
 from aiogram import Bot, Dispatcher, types
