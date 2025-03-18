@@ -63,25 +63,42 @@ async def product_type_handler(callback: types.CallbackQuery, state: FSMContext)
         await callback.message.edit_text(tg.getMessagePart(), reply_markup=keyboardFabric.createKeyboardWithBackButton(buttons, backAction))
     
     await state.clear()
+    await state.set_data({
+        "isBasket": False
+    })
 
 @dp.callback_query(F.data.in_([
     str(product.id) for product in CRUD.for_model(Product).all(db_session)
 ]))
 async def process_callback(callback: types.CallbackQuery, state: FSMContext):
+    data = await state.get_data()
     product = CRUD.for_model(Product).get(db_session, id=int(callback.data))[0]
-    buttons = []
-    maxQuantity = product.quantity
-    await state.set_data({
-        "productId": product.id,
-        "currQuantity": 1,
-        "maxQuantity": maxQuantity
-    })
-    keyboard = await keyboardFabric.createBeforeBasketKeyboard(state)
+    photo = types.FSInputFile(f"{photo_path}/{product.photo}")
+
+    if data.get("isBasket") == False:
+        buttons = []
+        maxQuantity = product.quantity
+        await state.set_data({
+            "productId": product.id,
+            "currQuantity": 1,
+            "maxQuantity": maxQuantity
+        })
+        keyboard = await keyboardFabric.createBeforeBasketKeyboard(state)
+    else:
+        basket_position = CRUD.for_model(Basket).get(db_session, user_id=callback.from_user.id, products_id=product.id)[0]
+        await state.set_data({
+            "isBasket": True,
+            "productId": product.id,
+            "currQuantity": basket_position.quantity,
+            "maxQuantity": product.quantity
+        })
+        keyboard = await keyboardFabric.createProductFromBasketKeyboard(state)
+        # TODO: add this
+        pass
+
     await callback.message.delete()
     await callback.message.answer_photo(
-        types.FSInputFile(
-            f"{photo_path}/{product.photo}"
-        ),
+        photo,
         caption="{}\n\n{}\n\n{}".format(product.name, product.description, product.price),
         reply_markup=keyboard
     )
@@ -114,10 +131,11 @@ async def add_to_basket(callback: types.CallbackQuery, state: FSMContext):
 
     await state.clear()
 
+# TODO: change message + keyboard to show that like in /idk
 @dp.callback_query(
     F.data == "basket"
 )
-async def basket(callback: types.CallbackQuery):
+async def basket(callback: types.CallbackQuery, state: FSMContext):
     basket = CRUD.for_model(Basket).get(db_session, user_id=callback.from_user.id)
     buttons = []
     text = ""
@@ -131,10 +149,12 @@ async def basket(callback: types.CallbackQuery):
             )
         )
         text += f"Товар: {product.name} \nКол-во: {quantity}\n\n"
+    await state.set_data({
+        "isBasket": True,
+    })
     keyboard = keyboardFabric.createKeyboardWithBackButton(buttons, "menu")
     await callback.message.delete()
     await callback.message.answer("Ваша корзина:\n\n"+text, reply_markup=keyboard)
-    
     
 @dp.message(Command("idk"))
 async def handler_idk(message: Message):
@@ -146,6 +166,12 @@ async def handler_idk(message: Message):
         ]),
         parse_mode='HTML'
     )
+
+@dp.callback_query(F.data == "remove_from_basket")
+async def remove_from_basket(callback: types.CallbackQuery, state: FSMContext):
+    basket_position = CRUD.for_model(Basket).get(db_session, user_id=callback.from_user.id, products_id=(await state.get_data())["productId"])[0]
+    CRUD.for_model(Basket).delete(db_session, basket_position.id)
+    await basket(callback, state)
 
 # admin functions
 @dp.callback_query(F.data == "create_product")

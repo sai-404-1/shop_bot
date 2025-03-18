@@ -42,7 +42,6 @@ def createKeyboardWithBackButton(buttons: list[Button], backAction: str) -> Inli
 
 async def createBeforeBasketKeyboard(state: FSMContext) -> InlineKeyboardMarkup:
     data = await state.get_data()
-    print(data)
     buttons = []
     buttons.append(InlineButton("Добавить в корзину", "add_to_basket"))
     # типа обработка fsm (какое-то значение поставить в id товара)
@@ -73,3 +72,12 @@ async def createAfterBasketKeyboard(state: FSMContext) -> InlineKeyboardMarkup:
     backAction = productType.name
     
     return createKeyboardWithBackButton(buttons, backAction)
+
+async def createProductFromBasketKeyboard(state: FSMContext) -> InlineKeyboardMarkup:
+    data = await state.get_data()
+    buttons = []
+    buttons.append(InlineButton("Удалить из корзины", "remove_from_basket"))
+    currQuantity = data['currQuantity']
+    print(f"CURRENT QUANTITY: {currQuantity}")
+    buttons.append(InlineButton(f"Количество: {currQuantity}", "changeQuantity"))
+    return createKeyboardWithBackButton(buttons, "basket")    
