@@ -95,7 +95,7 @@ async def message_try(message: Message, state: FSMContext, bot: Bot):
     data.update({'product_photo': f"{file_id[:10]}..."})
     await data['product_create_progress'].edit_text(await create_progress_message(data))
 
-    CRUD.for_model(Product).create(
+    product = CRUD.for_model(Product).create(
         db_session,
         name=data.get(product_template[0][1]),
         description=data.get(product_template[1][1]),
@@ -106,7 +106,7 @@ async def message_try(message: Message, state: FSMContext, bot: Bot):
     )
     
     await data['product_create_progress'].edit_text(
-        f'Товар с названием "{data.get(product_template[0][1])}" в категории {data.get(product_template[3][1])} создан!'
+        f'Товар с названием "{data.get(product_template[0][1])}" в категории {data.get(product_template[3][1])} создан!\nСсылка на товар: {await create_start_link(bot, str(product.id))}'
     )
     await state.clear()
     await message.delete()

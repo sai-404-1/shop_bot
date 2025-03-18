@@ -6,6 +6,7 @@ from .buttons import *
 from starter import *
 
 # NEED TO CHECK, MAYBE THIS FUNCTION IS NOT USED
+# i think, about that's realy doesn't used anywhere
 def categories():
     builder = InlineKeyboardBuilder()
     for categorie in templates.categories:

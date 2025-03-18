@@ -98,9 +98,12 @@ async def process_callback(callback: types.CallbackQuery, state: FSMContext):
 
     await callback.message.delete()
     await callback.message.answer_photo(
-        photo,
-        caption="{}\n\n{}\n\n{}".format(product.name, product.description, product.price),
-        reply_markup=keyboard
+        types.FSInputFile(
+            f"{photo_path}/{product.photo}"
+        ),
+        caption="{}\n\n{}\n\n{}\n\n[Ссылка на товар]({})".format(product.name, product.description, product.price, await create_start_link(bot, str(product.id))),
+        reply_markup=keyboard,
+        parse_mode="Markdown"
     )
 
 @dp.callback_query(
