@@ -11,14 +11,16 @@ from aiogram.fsm.context import FSMContext
 from aiogram import Router
 
 # Инициализация бота и диспетчера
-TOKEN = "8107506318:AAEdGyBoDxqXKMwxDdPezJ3lmv7KS_2ccbY" #manager.get_token()
+TOKEN = "7992777592:AAFdMeBsbvwkz4lVAOT1uMPdP9w_MQK4XN4" #manager.get_token()
 db_session = Database('src/database.db').Session()
 fsm_router = Router()
+callback_router = Router()
 photo_path = "src/photo"
 
 bot = Bot(token=TOKEN)
 dp = Dispatcher()
 dp.include_router(fsm_router)
+dp.include_router(callback_router)
 
 # Запуск бота
 async def main():

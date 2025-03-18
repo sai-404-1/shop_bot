@@ -185,3 +185,19 @@ async def db_changer(callback: types.CallbackQuery, state: FSMContext):
         'product_create_progress': progress_message, 'current_message': current_message
     })
     await state.set_data(data)
+
+
+
+@dp.callback_query(F.data == "delete_message")
+async def delete_message(callback: types.CallbackQuery):
+    await callback.message.delete()
+
+@callback_router.callback_query()
+async def handle_unknown_callback(callback: types.CallbackQuery):
+    await callback.message.answer(
+        text=f"⚠️ {callback.data.title()}\n Эта кнопка пока не работает.",
+        reply_markup=keyboardFabric.createCustomInlineKeyboard([
+            InlineButton(
+                "Удалить сообщение 🗑",
+                "delete_message"
+    )]))
