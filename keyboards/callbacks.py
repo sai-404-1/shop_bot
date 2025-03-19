@@ -178,7 +178,7 @@ async def remove_from_basket(callback: types.CallbackQuery, state: FSMContext):
 
 # admin functions
 @dp.callback_query(F.data == "create_product")
-async def db_changer(callback: types.CallbackQuery, state: FSMContext):
+async def create_product(callback: types.CallbackQuery, state: FSMContext):
     await state.set_state(StatesForCreate.product_name)
     await callback.answer("Идёт процесс создния товара...")
     current_message = await callback.message.answer("Введите название")
@@ -188,8 +188,6 @@ async def db_changer(callback: types.CallbackQuery, state: FSMContext):
         'product_create_progress': progress_message, 'current_message': current_message
     })
     await state.set_data(data)
-
-
 
 @dp.callback_query(F.data == "delete_message")
 async def delete_message(callback: types.CallbackQuery):

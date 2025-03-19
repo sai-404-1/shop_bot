@@ -2,6 +2,7 @@ import keyboards.keyboardFabric as keyboardFabric
 import keyboards.callbacks as inline_callbacks
 import manager.fsm.fsm_handler as fsm_handler
 import keyboards.buttons as button_types
+import keyboards.change_product_callbacks as product_changer
 
 import myUtils.Json as Json
 
