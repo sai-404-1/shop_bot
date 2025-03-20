@@ -23,7 +23,7 @@ async def cmd_start_arguments(message: Message, command: CommandObject, state: F
         types.FSInputFile(
             f"{photo_path}/{product.photo}"
         ),
-        caption="{}\n\n{}\n\n{}\n\n[Ссылка на товар]({})".format(product.name, product.description, product.price, await create_start_link(bot, str(product.id))),
+        caption="{}\n\n{}\n\n[Ссылка на товар]({})".format(product.name, product.price, await create_start_link(bot, str(product.id))),
         reply_markup=keyboard,
         parse_mode="Markdown"
     )

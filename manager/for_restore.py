@@ -49,12 +49,105 @@ try:
 
     # Заполнение типов
     CRUD.for_model(Type).create(db_session, 
-        name="apple", 
+        name="etc",
+        newest=True,
+        description="Тип для Монстров"
+    )
+    CRUD.for_model(Type).create(db_session, 
+        name="ps",
+        newest=True,
+        description="Тип для PlayStation"
+    )
+    CRUD.for_model(Type).create(db_session, 
+        name="xbox",
+        newest=True,
+        description="Тип для xbox"
+    )
+    CRUD.for_model(Type).create(db_session, 
+        name="chargers", 
+        newest=True,
+        description="Тип для зарядных устройств"
+    )
+    CRUD.for_model(Type).create(db_session, 
+        name="cases", 
+        description="Тип для чехлов"
+    )
+    CRUD.for_model(Type).create(db_session, 
+        name="glasses", 
+        description="Тип для стёкол"
+    )
+    CRUD.for_model(Type).create(db_session, 
+        name="speakers", 
+        description="Тип для колонок"
+    )
+
+    CRUD.for_model(Type).create(db_session, 
+        name="dyson_styler", 
+        description="Тип для стайлера dyson"
+    )
+    CRUD.for_model(Type).create(db_session, 
+        name="dyson_straightener", 
+        description="Тип для выпрямителя dyson"
+    )
+    CRUD.for_model(Type).create(db_session, 
+        name="dyson_hair_dryer", 
+        description="Тип для фена dyson"
+    )
+    # б/у                             ================================================
+    CRUD.for_model(Type).create(db_session, 
+        name="used_iphone", 
+        description="Тип для б/у iphone"
+    )
+    CRUD.for_model(Type).create(db_session, 
+        name="used_android", 
+        description="Тип для б/у android"
+    )
+    CRUD.for_model(Type).create(db_session, 
+        name="used_tablets", 
+        description="Тип для б/у планшетов"
+    )
+    CRUD.for_model(Type).create(db_session, 
+        name="used_notebooks", 
+        description="Тип для б/у ноутбуков"
+    )
+    CRUD.for_model(Type).create(db_session, 
+        name="used_watches", 
+        description="Тип для б/у часов"
+    )
+    CRUD.for_model(Type).create(db_session, 
+        name="used_headphones", 
+        description="Тип для б/у наушников"
+    )
+    CRUD.for_model(Type).create(db_session, 
+        name="dyson_hair_dryer", 
+        description="Тип для фена dyson"
+    )
+
+    # новые                             ================================================
+    CRUD.for_model(Type).create(db_session, 
+        name="apple",
+        newest=True,
         description="Тип для iPhone"
     )
     CRUD.for_model(Type).create(db_session, 
-        name="etc", 
-        description="Тип для Монстров"
+        name="new_android", 
+        description="Тип для новых android"
+    )
+    CRUD.for_model(Type).create(db_session, 
+        name="new_tablets", 
+        description="Тип для новых планшетов"
+    )
+    CRUD.for_model(Type).create(db_session, 
+        name="new_notebooks", 
+        description="Тип для новых ноутбуков"
+    )
+    CRUD.for_model(Type).create(db_session, 
+        name="new_watches", 
+        description="Тип для новых часов"
+    )
+    CRUD.for_model(Type).create(db_session, 
+        name="new_headphones", 
+        description="Тип для новых наушников"
     )
     print("Types was created")
 

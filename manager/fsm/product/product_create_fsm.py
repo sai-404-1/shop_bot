@@ -12,7 +12,7 @@ product_create_states = [
 
 product_template = [
     ["Название", "product_name"],
-    ["Описание", "product_description"],
+    # ["Описание", "product_description"],
     ["Цена", "product_price"],
     ["Тип", "product_type"],
     ["Фотография", "product_photo"]
@@ -28,22 +28,12 @@ async def create_progress_message(data):
 async def message_try(message: Message, state: FSMContext):
     data = await state.get_data()
     await data.get('current_message').delete()
-    current_message = await message.answer('Теперь описание')
+    current_message = await message.answer('Теперь цена',
+        reply_markup=keyboardFabric.createCustomInlineKeyboard([
+            keyboardFabric.InlineButton("Отменить процесс", "cancel_task")
+    ]))
     data.update(
         {'product_name': message.text, 'current_message': current_message}
-    )
-    await state.set_data(data)
-    await state.set_state(StatesForCreate.product_description)
-    await data['product_create_progress'].edit_text(await create_progress_message(data))
-    await message.delete()
-
-@fsm_router.message(StatesForCreate.product_description)
-async def message_try(message: Message, state: FSMContext):
-    data = await state.get_data()
-    await data.get('current_message').delete()
-    current_message = await message.answer('Теперь цена')
-    data.update(
-        {'product_description': message.text, 'current_message': current_message}
     )
     await state.set_data(data)
     await state.set_state(StatesForCreate.product_price)
@@ -70,7 +60,10 @@ async def message_try(message: Message, state: FSMContext):
 async def message_try(callback: types.CallbackQuery, state: FSMContext):
     data = await state.get_data()
     await data.get('current_message').delete()
-    current_message = await callback.message.answer('Теперь отправьте фотографию товара')
+    current_message = await callback.message.answer('Теперь отправьте фотографию товара',
+        reply_markup=keyboardFabric.createCustomInlineKeyboard([
+            keyboardFabric.InlineButton("Отменить процесс", "cancel_task")
+    ]))
     data.update(
         {'product_type': callback.data.replace('_create_product', ''), 'current_message': current_message}
     )
@@ -97,16 +90,20 @@ async def message_try(message: Message, state: FSMContext, bot: Bot):
 
     product = CRUD.for_model(Product).create(
         db_session,
-        name=data.get(product_template[0][1]),
-        description=data.get(product_template[1][1]),
+        name=data.get("product_name"),
+        description="",
         photo=f"{file_id}.jpg",
-        price=data.get(product_template[2][1]),
+        price=data.get("product_price"),
         type_id=\
-        CRUD.for_model(Type).get(db_session, name=data.get(product_template[3][1]))[0].id
+        CRUD.for_model(Type).get(db_session, name=data.get("product_type"))[0].id
     )
     
     await data['product_create_progress'].edit_text(
-        f'Товар с названием "{data.get(product_template[0][1])}" в категории {data.get(product_template[3][1])} создан!\nСсылка на товар: {await create_start_link(bot, str(product.id))}'
-    )
+        f'Товар с названием "{data.get("product_name")}" в категории {data.get("product_type")} создан!\nСсылка на товар: {await create_start_link(bot, str(product.id))}',
+        reply_markup=keyboardFabric.createCustomInlineKeyboard([
+            keyboardFabric.InlineButton(
+                "Удалить сообщение 🗑",
+                "delete_message"
+    )]))
     await state.clear()
     await message.delete()

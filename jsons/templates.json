@@ -17,8 +17,7 @@
     ],
 
     "database_change": [
-        ["Товары", "admin_menu_products"],
-        ["Категории/типы", "admin_menu_types"]
+        ["Товары", "admin_menu_products"]
     ],
 
     "admin_menu_products": [

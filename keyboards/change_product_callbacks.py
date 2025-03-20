@@ -6,10 +6,10 @@ import keyboards.keyboardFabric as keyboardFabric
 async def change_products(callback: types.CallbackQuery, state: FSMContext):
     await callback.message.edit_text(
         text="Выберите тип товара",
-        reply_markup=keyboardFabric.createCustomInlineKeyboard([
-            InlineButton(text=f"{type.name}", callback_data=f"changeProductWithType__{type.id}__{type.name}") for type in CRUD.for_model(Type).all(db_session)
-        ])
-    )
+        reply_markup=keyboardFabric.createKeyboardWithBackButton([
+            InlineButton(text=f"{type.title}", callback_data=f"changeProductWithType__{type.id}__{type.name}") for type in CRUD.for_model(Type).all(db_session)
+        ], "admin_menu_products"))
+    
 
 @dp.callback_query(F.data.startswith('changeProductWithType'))
 async def change_product_with_type(callback: types.CallbackQuery, state: FSMContext):
@@ -99,7 +99,8 @@ async def change_product(callback: types.CallbackQuery, state: FSMContext):
 
 @dp.callback_query(F.data == "cancel_task")
 async def cancel_task(callback: types.CallbackQuery, state: FSMContext):
+    await callback.answer('Действие отменено.')
+    data = await state.get_data()
+    await data["product_create_progress"].delete()
+    await callback.message.delete()
     await state.clear()
-    await callback.message.edit_text(
-        text="Состояние было сбросшено"
-    )

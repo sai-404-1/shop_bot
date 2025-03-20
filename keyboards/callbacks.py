@@ -24,11 +24,16 @@ async def send_generated_message(callback):
     "main", "categories", "menu", "new_devices",
     "used_devices", "beauty", "game_consoles",
     "accessories", "new_smartphones", "used_smartphones", 
-    "database_change", "admin_menu_products"
 ]))
 async def regenerate_button_callback(callback: types.CallbackQuery, state: FSMContext):
     await send_generated_message(callback)
     await state.clear()
+
+@dp.callback_query(F.data.in_(["database_change", "admin_menu_products"]))
+async def check_for_admin(callback: types.CallbackQuery, state: FSMContext):
+    user = CRUD.for_model(Users).get(db_session, user_id=callback.from_user.id)[0]
+    if user.role < 1: await callback.message.delete()
+    else: await send_generated_message(callback)
 
 @dp.callback_query(F.data.in_(
     [obj.name for obj in CRUD.for_model(Type).get(db_session)]
@@ -247,8 +252,12 @@ async def history(callback: types.CallbackQuery, state: FSMContext):
 async def create_product(callback: types.CallbackQuery, state: FSMContext):
     await state.set_state(StatesForCreate.product_name)
     await callback.answer("Идёт процесс создния товара...")
-    current_message = await callback.message.answer("Введите название")
     progress_message = await callback.message.answer("...")
+    current_message = await callback.message.answer("Введите название",
+        reply_markup=keyboardFabric.createCustomInlineKeyboard([
+            InlineButton("Отменить процесс", "cancel_task")
+        ])
+    )
     data = await state.get_data()
     data.update({
         'product_create_progress': progress_message, 'current_message': current_message
