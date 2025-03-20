@@ -36,6 +36,7 @@ class CRUD:
     def update(self, db: Session, model_id: int, **kwargs):
         """Обновить все поля модели"""
         obj = db.query(self.model).filter(self.model.id == model_id).first()
+        print(kwargs)
         if obj:
             for field, value in kwargs.items():
                 setattr(obj, field, value)

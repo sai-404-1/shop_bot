@@ -19,3 +19,7 @@ class StatesForUpdate(StatesGroup):
 
 class StatesForButtons(StatesGroup):
     ready_to_enter_new_quantity = State()
+
+class StatesForManager(StatesGroup):
+    userCommunicate = State()
+    managerCommunicate = State()

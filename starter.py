@@ -1,6 +1,6 @@
 from manager.base import *
 import manager.templates as templates
-from manager.fsm.fsm_class import StatesForCreate, StatesForUpdate, StatesForButtons
+from manager.fsm.fsm_class import StatesForCreate, StatesForUpdate, StatesForButtons, StatesForManager
 from keyboards import keyboardFabric
 
 from aiogram import Bot, Dispatcher, types
@@ -12,7 +12,7 @@ from aiogram import Router
 from aiogram.utils.deep_linking import create_start_link
 
 # Инициализация бота и диспетчера
-TOKEN = "7992777592:AAFdMeBsbvwkz4lVAOT1uMPdP9w_MQK4XN4" #manager.get_token()
+TOKEN = "8107506318:AAEdGyBoDxqXKMwxDdPezJ3lmv7KS_2ccbY" #manager.get_token()
 db_session = Database('src/database.db').Session()
 photo_path = "src/photo"
 

@@ -28,6 +28,7 @@ async def send_generated_message(callback):
 ]))
 async def regenerate_button_callback(callback: types.CallbackQuery, state: FSMContext):
     await send_generated_message(callback)
+    await state.clear()
 
 @dp.callback_query(F.data.in_(
     [obj.name for obj in CRUD.for_model(Type).get(db_session)]
@@ -155,7 +156,7 @@ async def basket(callback: types.CallbackQuery, state: FSMContext):
     await state.set_data({
         "isBasket": True,
     })
-    keyboard = keyboardFabric.createKeyboardWithBackButton(buttons, "menu")
+    keyboard = keyboardFabric.createKeyboardWithBackButton(buttons, "main")
     await callback.message.delete()
     await callback.message.answer("Ваша корзина:\n\n"+text, reply_markup=keyboard)
     
@@ -175,6 +176,71 @@ async def remove_from_basket(callback: types.CallbackQuery, state: FSMContext):
     basket_position = CRUD.for_model(Basket).get(db_session, user_id=callback.from_user.id, products_id=(await state.get_data())["productId"])[0]
     CRUD.for_model(Basket).delete(db_session, basket_position.id)
     await basket(callback, state)
+
+@dp.callback_query(F.data == "manager")
+async def manager(callback: types.CallbackQuery, state: FSMContext):
+    chat = CRUD.for_model(Communication).get(db_session, user_id=callback.from_user.id)
+    if len(chat) == 0:
+        CRUD.for_model(Communication).create(db_session, user_id=callback.from_user.id)
+        chat = CRUD.for_model(Communication).get(db_session, user_id=callback.from_user.id)
+    chat = chat[0]
+    await callback.message.delete()
+    await callback.message.answer(
+        "Вы перешли в чат с поддержкой.\nПожалуйста, опишите вашу проблему и ожидайте ответа", 
+        reply_markup=keyboardFabric.createKeyboardWithBackButton([], "main")
+    )
+    await state.set_state(StatesForManager.userCommunicate)
+
+async def sendLastMessages(callback: types.CallbackQuery, messages: list, amount: int = 20) -> None:
+    if amount > len(messages):
+        amount = len(messages)
+    messages = messages[-amount:]
+    for message in messages:
+        await callback.message.answer(
+            "{}:\n{}".format(message[0], message[1])
+        )
+
+# for admins
+@dp.callback_query(F.data.contains("//support//"))
+async def support(callback: types.CallbackQuery, state: FSMContext):
+    import json
+    user_id = int(callback.data.split("//support//")[1])
+    chat = CRUD.for_model(Communication).get(db_session, user_id=user_id)[0]
+    CRUD.for_model(Communication).update(db_session, chat.id, readed=True)
+    await sendLastMessages(callback, json.loads(chat.messages), amount=1)
+    await callback.message.answer(
+        "Вы перешли в чат с пользователем {}.\nОтправьте ответ на его вопрос".format(user_id),
+        reply_markup=keyboardFabric.createKeyboardWithBackButton(
+            [InlineButton("Последние 20 сообщений", "history")], "main"
+        )
+    )
+    await state.set_state(StatesForManager.managerCommunicate)
+    await state.set_data({
+        "userId": user_id,
+    })
+
+# for users
+@dp.callback_query(F.data.contains("//help//"))
+async def help(callback: types.CallbackQuery,state: FSMContext):
+    await callback.message.delete()
+    await callback.message.answer(
+        "Вы перешли в чат с поддержкой.\nЕсли у вас остались вопросы - задайте их", 
+        reply_markup=keyboardFabric.createKeyboardWithBackButton(
+            [InlineButton("Последние 20 сообщений", "history")], "main"
+        )
+    )
+    await state.set_data({
+        "userId": callaback.from_user.id
+    })
+    await state.set_state(StatesForManager.userCommunicate)
+    print(callback.data)
+
+@dp.callback_query(F.data == "history")
+async def history(callback: types.CallbackQuery, state: FSMContext):
+    import json
+    user_id = (await state.get_data())["userId"]
+    chat = CRUD.for_model(Communication).get(db_session, user_id=user_id)[0]
+    await sendLastMessages(callback, json.loads(chat.messages))
 
 # admin functions
 @dp.callback_query(F.data == "create_product")
