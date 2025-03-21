@@ -67,12 +67,12 @@ async def check_for_admin(callback: types.CallbackQuery, state: FSMContext):
 ))
 async def product_type_handler(callback: types.CallbackQuery, state: FSMContext):
     type_id = CRUD.for_model(Type).get(db_session, name=callback.data)[0].id
-    phones = CRUD.for_model(Product).get(db_session, type_id=type_id)
+    products = CRUD.for_model(Product).get(db_session, type_id=type_id)
     buttons = []
     tg = messageGenerator.TextGenerator(callback.data)
 
-    for phone in phones:
-        buttons.append(InlineButton(phone.name, str(phone.id)))
+    for product in products:
+        buttons.append(InlineButton(product.name, f"product__{product.id}"))
     
     backAction = "pupupu"
     dataset = Json.getMainDataset()
@@ -100,12 +100,10 @@ async def product_type_handler(callback: types.CallbackQuery, state: FSMContext)
         "isBasket": False
     })
 
-@dp.callback_query(F.data.in_([
-    str(product.id) for product in CRUD.for_model(Product).all(db_session)
-]))
+@dp.callback_query(F.data.startswith("product"))
 async def process_callback(callback: types.CallbackQuery, state: FSMContext):
     data = await state.get_data()
-    product = CRUD.for_model(Product).get(db_session, id=int(callback.data))[0]
+    product = CRUD.for_model(Product).get(db_session, id=int(callback.data.split("__")[1]))[0]
     photo = types.FSInputFile(f"{photo_path}/{product.photo}")
 
     if data.get("isBasket") == False:
@@ -134,7 +132,7 @@ async def process_callback(callback: types.CallbackQuery, state: FSMContext):
         types.FSInputFile(
             f"{photo_path}/{product.photo}"
         ),
-        caption="{}\n\n{}\n\n{}\n\n[Ссылка на товар]({})".format(product.name, product.description, product.price, await create_start_link(bot, str(product.id))),
+        caption="{}\n\n{}\n\n[Ссылка на товар]({})".format(product.name, product.price, await create_start_link(bot, str(product.id))),
         reply_markup=keyboard,
         parse_mode="Markdown"
     )
@@ -181,7 +179,7 @@ async def basket(callback: types.CallbackQuery, state: FSMContext):
         buttons.append(
             InlineButton(
                 product.name, 
-                str(product.id)
+                f"product__{product.id}"
             )
         )
         text += f"Товар: {product.name} \nКол-во: {quantity}\n\n"
