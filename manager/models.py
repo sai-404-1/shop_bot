@@ -43,6 +43,7 @@ class Type(Base):
     name = Column(String, nullable=False)
     title = Column(String, nullable=False)
     description = Column(String, nullable=False)
+    rate = Column(Integer, nullable=True, default=0)
 
 class TextContent(Base):
     __tablename__ = "texts"

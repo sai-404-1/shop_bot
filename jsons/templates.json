@@ -23,7 +23,8 @@
 
     "admin_menu_products": [
         ["Создать товар", "create_product"],
-        ["Изменить товар", "change_products"]
+        ["Изменить товар", "change_products"],
+        ["Удалить товар", "delete_product"]
     ],
 
     "menu": [

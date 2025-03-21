@@ -4,10 +4,12 @@ import keyboards.keyboardFabric as keyboardFabric
 
 @dp.callback_query(F.data == "change_products")
 async def change_products(callback: types.CallbackQuery, state: FSMContext):
+    not_sorted = CRUD.for_model(Type).all(db_session)
+    sorted_array = sorted(not_sorted, key=lambda x: x.rate, reverse=True)
     await callback.message.edit_text(
         text="Выберите тип товара",
         reply_markup=keyboardFabric.createKeyboardWithBackButton([
-            InlineButton(text=f"{type.title}", callback_data=f"changeProductWithType__{type.id}__{type.name}") for type in CRUD.for_model(Type).all(db_session)
+            InlineButton(text=f"{type.title}", callback_data=f"changeProductWithType__{type.id}__{type.name}") for type in sorted_array
         ], "admin_menu_products"))
     
 
@@ -15,6 +17,8 @@ async def change_products(callback: types.CallbackQuery, state: FSMContext):
 async def change_product_with_type(callback: types.CallbackQuery, state: FSMContext):
     data = callback.data.split('__')
     products = CRUD.for_model(Product).get(db_session, type_id=int(data[1]))
+    type = CRUD.for_model(Type).get(db_session, id=int(data[1]))[0]
+    CRUD.for_model(Type).update(db_session, model_id=type.id, rate=type.rate+1)
     await callback.message.edit_text(
         text=f"Выберите продукт из категории {data[2]}",
         reply_markup=keyboardFabric.createCustomInlineKeyboard([
@@ -37,7 +41,7 @@ async def change_product(callback: types.CallbackQuery, state: FSMContext):
         text=f"Выберите параметр продукта <code>{product.name}</code>",
         reply_markup=keyboardFabric.createCustomInlineKeyboard([
             InlineButton(text="Название", callback_data=f"changeNameProduct__{product.id}"),
-            InlineButton(text="Описание", callback_data=f"changeDescriptionProduct__{product.id}"),
+            # InlineButton(text="Описание", callback_data=f"changeDescriptionProduct__{product.id}"),
             InlineButton(text="Цена", callback_data=f"changePriceProduct__{product.id}"),
             InlineButton(text="Тип", callback_data=f"changeTypeProduct__{product.id}"),
             InlineButton(text="Фотография", callback_data=f"changePhotoProduct__{product.id}"),
@@ -60,17 +64,17 @@ async def change_product(callback: types.CallbackQuery, state: FSMContext):
             ]),
         )
 
-    elif "description" in data[0].lower():
-        await state.set_state(StatesForUpdate.product_description)
-        await callback.message.answer(
-            text="Введите новое описание для продукта",
-            reply_markup=keyboardFabric.createCustomInlineKeyboard([
-                InlineButton(text="Отменить действие", callback_data="cancel_task")
-            ]),
-        )
+    # elif "description" in data[0].lower():
+    #     await state.set_state(StatesForUpdate.product_description)
+    #     await callback.message.answer(
+    #         text="Введите новое описание для продукта",
+    #         reply_markup=keyboardFabric.createCustomInlineKeyboard([
+    #             InlineButton(text="Отменить действие", callback_data="cancel_task")
+    #         ]),
+    #     )
 
     elif "price" in data[0].lower():
-        await state.set_state(StatesForUpdate.product_name)
+        await state.set_state(StatesForUpdate.product_description)
         await callback.message.answer(
             text="Введите новую цену для продукта",
             reply_markup=keyboardFabric.createCustomInlineKeyboard([
@@ -79,22 +83,24 @@ async def change_product(callback: types.CallbackQuery, state: FSMContext):
         )
 
     elif "type" in data[0].lower():
-        await state.set_state(StatesForUpdate.product_name)
+        await state.set_state(StatesForUpdate.product_type)
+        not_sorted = CRUD.for_model(Type).all(db_session)
+        sorted_array = sorted(not_sorted, key=lambda x: x.rate, reverse=True)
         await callback.message.answer(
             text="Введите новый тип для продукта",
             reply_markup=keyboardFabric.createCustomInlineKeyboard(
-                keyboardFabric.InlineButton(type.name, f"typeUpdate__{type.id}") for type in CRUD.for_model(Type).all(db_session)
+                keyboardFabric.InlineButton(type.name, f"typeUpdate__{type.id}") for type in sorted_array
             )
         )
 
-    # elif "photo" in data[0].lower():
-    #     await state.set_state(StatesForUpdate.product_name)
-    #     await callback.message.answer(
-    #         text="Отправьте новую фотографию для продукта",
-    #         reply_markup=keyboardFabric.createCustomInlineKeyboard([
-    #             InlineButton(text="Отменить действие", callback_data="cancel_task")
-    #         ]),
-    #     )
+    elif "photo" in data[0].lower():
+        await state.set_state(StatesForUpdate.product_photo)
+        await callback.message.answer(
+            text="Отправьте новую фотографию для продукта",
+            reply_markup=keyboardFabric.createCustomInlineKeyboard([
+                InlineButton(text="Отменить действие", callback_data="cancel_task")
+            ]),
+        )
 
 
 @dp.callback_query(F.data == "cancel_task")
