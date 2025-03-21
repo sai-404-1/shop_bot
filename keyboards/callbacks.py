@@ -1,5 +1,7 @@
 from starter import *
 
+from aiogram.utils.keyboard import InlineKeyboardMarkup
+
 from .buttons import *
 import keyboards.keyboardFabric as keyboardFabric
 import keyboards.messageGenerator as messageGenerator
@@ -21,13 +23,38 @@ async def send_generated_message(callback):
 # ))
 # but before - add all jsons to db
 @dp.callback_query(F.data.in_([
-    "main", "categories", "menu", "new_devices",
+    "categories", "menu", "new_devices",
     "used_devices", "beauty", "game_consoles",
     "accessories", "new_smartphones", "used_smartphones", 
 ]))
 async def regenerate_button_callback(callback: types.CallbackQuery, state: FSMContext):
     await send_generated_message(callback)
     await state.clear()
+
+@dp.callback_query(F.data == "main")
+async def cmd_start(callback: types.CallbackQuery, state: FSMContext):
+    dataset = Json.getMainDataset()
+    message = callback.message
+    await state.clear()
+
+    # We are creating a new user if that not be was before
+    user = CRUD.for_model(Users).get(db_session, user_id=message.from_user.id)
+    if len(user) == 0:
+        user = CRUD.for_model(Users).create(db_session, 
+            username=message.from_user.username, 
+            user_id=message.from_user.id
+        )
+    else: user = user[0]
+    
+    # Creating /start menu
+    buttons = []
+    for button_data in dataset["main"] if user.role >= 1 else dataset["main"][:2]:
+        buttons.append(InlineButton(button_data[0], button_data[1]))
+
+    await message.edit_text(
+        text=dataset["message_texts"]["main"],
+        reply_markup=keyboardFabric.createCustomInlineKeyboard(buttons)
+    )
 
 @dp.callback_query(F.data.in_(["database_change", "admin_menu_products"]))
 async def check_for_admin(callback: types.CallbackQuery, state: FSMContext):
@@ -224,7 +251,7 @@ async def help(callback: types.CallbackQuery,state: FSMContext):
         )
     )
     await state.set_data({
-        "userId": callaback.from_user.id
+        "userId": callback.from_user.id
     })
     await state.set_state(StatesForManager.userCommunicate)
     print(callback.data)
@@ -237,6 +264,51 @@ async def history(callback: types.CallbackQuery, state: FSMContext):
     await sendLastMessages(callback, json.loads(chat.messages))
 
 # admin functions
+def get_pagination_keyboard(page: int) -> InlineKeyboardMarkup:
+    chats = CRUD.for_model(Communication).get(db_session)
+    chats = sorted(chats, key=lambda chat: chat.readed)
+    buttons = []
+    for chat in chats:
+        buttons.append(
+            InlineButton(
+                text="{} - {}".format(chat.user_id, '✅' if chat.readed else '❌'),
+                callback_data="//support//{}".format(chat.user_id)
+            )
+        )
+    return keyboardFabric.createPaginationKeyboard(buttons, page)
+
+# admin functions
+@dp.callback_query(F.data == "list_of_requests_help") 
+async def list_of_requests_help(callback: types.CallbackQuery, state: FSMContext):
+    await state.set_data({
+        "page": 0,
+    })
+    keyboard = get_pagination_keyboard(0)
+    await callback.message.edit_text("Список чатов", reply_markup=keyboard)
+
+@dp.callback_query(F.data == "pagination_back")
+async def pagination_back(callback: types.CallbackQuery, state: FSMContext):
+    data = await state.get_data()
+    await state.set_data({
+        "page": data["page"] - 1
+    })
+    keyboard = get_pagination_keyboard(data["page"] - 1)
+    await callback.message.edit_text("Список чатов", reply_markup=keyboard)
+
+@dp.callback_query(F.data == "pagination_forward")
+async def pagination_forward(callback: types.CallbackQuery, state: FSMContext):
+    data = await state.get_data()
+    await state.set_data({
+        "page": data["page"] + 1
+    })
+    keyboard = get_pagination_keyboard(data["page"] + 1)
+    await callback.message.edit_text("Список чатов", reply_markup=keyboard)
+
+@dp.callback_query(F.data == "nothing")
+async def Noting(callback: types.CallbackQuery, state: FSMContext):
+    # just nothing
+    pass
+
 @dp.callback_query(F.data == "create_product")
 async def create_product(callback: types.CallbackQuery, state: FSMContext):
     await state.set_state(StatesForCreate.product_name)

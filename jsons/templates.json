@@ -13,7 +13,8 @@
     "main": [
         ["Меню", "menu"],
         ["Корзина", "basket"],
-        ["Работа с базой", "database_change"]
+        ["Работа с базой", "database_change"],
+        ["Запросы на помощь", "list_of_requests_help"]
     ],
 
     "database_change": [
@@ -33,7 +34,6 @@
         ["Аксессуары", "accessories"],
         ["Корзина", "basket"],
         ["Связь с менеджером", "manager"],
-        ["Домой", "main"],
         ["Доставка / оплата", "delivery"]
     ],
 

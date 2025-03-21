@@ -82,3 +82,22 @@ async def createProductFromBasketKeyboard(state: FSMContext) -> InlineKeyboardMa
     print(f"CURRENT QUANTITY: {currQuantity}")
     buttons.append(InlineButton(f"Количество: {currQuantity}", "changeQuantity"))
     return createKeyboardWithBackButton(buttons, "basket")    
+
+def get_page(arr: list, page: int, page_size: int) -> list:
+    if len(arr) < page * page_size: return []
+    if len(arr) < (page + 1) * page_size: return arr[page * page_size:]
+    return arr[page * page_size: (page + 1) * page_size]
+
+def createPaginationKeyboard(items: list[InlineButton], page: int, page_size: int = 10) -> InlineKeyboardMarkup:
+    keyboard = InlineKeyboardBuilder()
+    items_size = len(items)
+    items = get_page(items, page, page_size)
+    for item in items:
+        keyboard.row(item.create())
+    last_row = []
+    if page != 0: last_row.append(InlineButton("<-", "pagination_back").create())
+    last_row.append(InlineButton(f"{page + 1}", "nothing").create())
+    if items_size > page_size * (page + 1): last_row.append(InlineButton("->", "pagination_forward").create())
+    keyboard.row(*last_row)
+    keyboard.row(InlineButton("Меню", "main").create())
+    return keyboard.as_markup()
