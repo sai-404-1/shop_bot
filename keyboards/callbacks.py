@@ -173,6 +173,7 @@ async def basket(callback: types.CallbackQuery, state: FSMContext):
     basket = CRUD.for_model(Basket).get(db_session, user_id=callback.from_user.id)
     buttons = []
     text = ""
+    # Add product validation 
     for basket_position in basket:
         product = CRUD.for_model(Product).get(db_session, id=basket_position.products_id)[0]
         quantity = basket_position.quantity
