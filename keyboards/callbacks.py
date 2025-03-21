@@ -167,7 +167,7 @@ async def add_to_basket(callback: types.CallbackQuery, state: FSMContext):
 
     await state.clear()
 
-# TODO: change message + keyboard to show that like in /idk
+
 @dp.callback_query(
     F.data == "basket"
 )
