@@ -4,14 +4,23 @@ import keyboards.keyboardFabric as keyboardFabric
 
 @dp.callback_query(F.data == "change_products")
 async def change_products(callback: types.CallbackQuery, state: FSMContext):
-    not_sorted = CRUD.for_model(Type).all(db_session)
+
+    product_exist_type_id = [product.type_id for product in CRUD.for_model(Product).all(db_session)]
+    types = CRUD.for_model(Type).all(db_session)
+
+    not_sorted = []
+    for type in types:
+        if type.id in product_exist_type_id:
+            print(type.title)
+            not_sorted.append(type)
+
     sorted_array = sorted(not_sorted, key=lambda x: x.rate, reverse=True)
     await callback.message.edit_text(
-        text="Выберите тип товара",
+        text="Выберите тип товара (перечислены в соответствии с частотой использования и существующими товарами)",
         reply_markup=keyboardFabric.createKeyboardWithBackButton([
             InlineButton(text=f"{type.title}", callback_data=f"changeProductWithType__{type.id}__{type.name}") for type in sorted_array
         ], "admin_menu_products"))
-    
+
 
 @dp.callback_query(F.data.startswith('changeProductWithType'))
 async def change_product_with_type(callback: types.CallbackQuery, state: FSMContext):

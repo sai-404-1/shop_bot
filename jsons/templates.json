@@ -13,8 +13,8 @@
     "main": [
         ["Меню", "menu"],
         ["Корзина", "basket"],
-        ["Работа с базой", "database_change"],
-        ["Запросы на помощь", "list_of_requests_help"]
+        ["Запросы на помощь", "list_of_requests_help"],
+        ["Работа с базой", "database_change"]
     ],
 
     "database_change": [

@@ -3,6 +3,7 @@ import keyboards.callbacks as inline_callbacks
 import manager.fsm.fsm_handler as fsm_handler
 import keyboards.buttons as button_types
 import keyboards.change_product_callbacks as product_changer
+import keyboards.delete_product_callbacks as product_deleter
 
 import myUtils.Json as Json
 
@@ -44,7 +45,7 @@ async def cmd_start(message: Message):
     
     # Creating /start menu
     buttons = []
-    for button_data in dataset["main"] if user.role >= 1 else dataset["main"][:2]:
+    for button_data in dataset["main"] if user.role >= 1 else dataset["main"][:3]:
         buttons.append(button_types.InlineButton(button_data[0], button_data[1]))
 
     await message.answer(

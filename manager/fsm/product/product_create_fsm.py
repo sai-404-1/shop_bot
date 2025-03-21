@@ -44,9 +44,11 @@ async def message_try(message: Message, state: FSMContext):
 async def message_try(message: Message, state: FSMContext):
     data = await state.get_data()
     await data.get('current_message').delete()
+    not_sorted = CRUD.for_model(Type).all(db_session)
+    sorted_array = sorted(not_sorted, key=lambda x: x.rate, reverse=True)
     current_message = await message.answer('Теперь тип товара',
         reply_markup=keyboardFabric.createCustomInlineKeyboard(
-            keyboardFabric.InlineButton(type.name, f"{type.name}_create_product") for type in CRUD.for_model(Type).all(db_session)
+            keyboardFabric.InlineButton(type.name, f"{type.title}_create_product") for type in sorted_array
     ))
     data.update(
         {'product_price': message.text, 'current_message': current_message}
