@@ -165,14 +165,6 @@ try:
     )
     print("Products was created")
 
-    CRUD.for_model(Product).create(db_session, 
-        name="Какой-то розовый монстр", 
-        description="Монстр в банке", 
-        price=666, 
-        photo="mosnterUS05.png", 
-        type_id=1
-    )
-
     CRUD.for_model(Users).create(db_session,
         user_id=5139311660,
         username="sai_404_1",
