@@ -79,7 +79,7 @@
     ],
 
     "new_smartphones": [
-        ["IPhone", "new_iphone"],
+        ["iPhone", "new_iphone"],
         ["Андроид", "new_android"],
         ["Связь с менеджером", "manager"],
         ["Домой", "main"],

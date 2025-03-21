@@ -164,17 +164,6 @@ async def basket(callback: types.CallbackQuery, state: FSMContext):
     keyboard = keyboardFabric.createKeyboardWithBackButton(buttons, "main")
     await callback.message.delete()
     await callback.message.answer("Ваша корзина:\n\n"+text, reply_markup=keyboard)
-    
-@dp.message(Command("idk"))
-async def handler_idk(message: Message):
-    text = "Ваша корзина\n<code>(товар / кол-во)</code>"
-    await message.answer(
-        text=text,
-        reply_markup=keyboardFabric.createCustomInlineKeyboard([
-            InlineButton(text=f"Назание – {i+1}", callback_data="123") for i in range(5)
-        ]),
-        parse_mode='HTML'
-    )
 
 @dp.callback_query(F.data == "remove_from_basket")
 async def remove_from_basket(callback: types.CallbackQuery, state: FSMContext):

@@ -50,117 +50,122 @@ try:
     # Заполнение типов
     CRUD.for_model(Type).create(db_session, 
         name="etc",
-        newest=True,
+        title="Другое",
         description="Тип для Монстров"
     )
     CRUD.for_model(Type).create(db_session, 
         name="ps",
-        newest=True,
+        title="PlayStation",
         description="Тип для PlayStation"
     )
     CRUD.for_model(Type).create(db_session, 
         name="xbox",
-        newest=True,
+        title="X-Box",
         description="Тип для xbox"
     )
     CRUD.for_model(Type).create(db_session, 
         name="chargers", 
-        newest=True,
+        title="Зарядные устройства",
         description="Тип для зарядных устройств"
     )
     CRUD.for_model(Type).create(db_session, 
         name="cases", 
+        title="Чехлы",
         description="Тип для чехлов"
     )
     CRUD.for_model(Type).create(db_session, 
         name="glasses", 
+        title="Стекла",
         description="Тип для стёкол"
     )
     CRUD.for_model(Type).create(db_session, 
         name="speakers", 
+        title="Колонки",
         description="Тип для колонок"
     )
 
     CRUD.for_model(Type).create(db_session, 
         name="dyson_styler", 
+        title="Стайлер Dyson",
         description="Тип для стайлера dyson"
     )
     CRUD.for_model(Type).create(db_session, 
         name="dyson_straightener", 
+        title="Выпрямитель Dyson",
         description="Тип для выпрямителя dyson"
     )
     CRUD.for_model(Type).create(db_session, 
         name="dyson_hair_dryer", 
+        title="Фен Dyson",
         description="Тип для фена dyson"
     )
-    # б/у                             ================================================
+    # б/у ================================================
     CRUD.for_model(Type).create(db_session, 
         name="used_iphone", 
+        title="Б/у iPhone",
         description="Тип для б/у iphone"
     )
     CRUD.for_model(Type).create(db_session, 
         name="used_android", 
+        title="Б/у Android",
         description="Тип для б/у android"
     )
     CRUD.for_model(Type).create(db_session, 
         name="used_tablets", 
+        title="Б/у Планшеты",
         description="Тип для б/у планшетов"
     )
     CRUD.for_model(Type).create(db_session, 
         name="used_notebooks", 
+        title="Б/у Ноутбуки",
         description="Тип для б/у ноутбуков"
     )
     CRUD.for_model(Type).create(db_session, 
         name="used_watches", 
+        title="Б/у Часы",
         description="Тип для б/у часов"
     )
     CRUD.for_model(Type).create(db_session, 
         name="used_headphones", 
+        title="Б/у Наушники",
         description="Тип для б/у наушников"
     )
     CRUD.for_model(Type).create(db_session, 
         name="dyson_hair_dryer", 
+        title="Фен Dyson",
         description="Тип для фена dyson"
     )
 
-    # новые                             ================================================
+    # новые ================================================
     CRUD.for_model(Type).create(db_session, 
-        name="apple",
-        newest=True,
+        name="new_iphone",
+        title="iPhone",
         description="Тип для iPhone"
     )
     CRUD.for_model(Type).create(db_session, 
         name="new_android", 
+        title="Новые Android",
         description="Тип для новых android"
     )
     CRUD.for_model(Type).create(db_session, 
         name="new_tablets", 
+        title="Новые Планшеты",
         description="Тип для новых планшетов"
     )
     CRUD.for_model(Type).create(db_session, 
         name="new_notebooks", 
+        title="Новые Ноутбуки",
         description="Тип для новых ноутбуков"
     )
     CRUD.for_model(Type).create(db_session, 
         name="new_watches", 
+        title="Новые Часы",
         description="Тип для новых часов"
     )
     CRUD.for_model(Type).create(db_session, 
         name="new_headphones", 
+        title="Новые Наушники",
         description="Тип для новых наушников"
-    )
-    print("Types was created")
-
-    # Заполнение пользователей
-    CRUD.for_model(Users).create(db_session,
-        user_id=5139311660,
-        username="sai_404_1",
-        role=1
-    )
-    CRUD.for_model(Users).create(db_session,
-        user_id=7594389667,
-        username="niko_404_1",
-        role=0
     )
     print("Users was created")
 
