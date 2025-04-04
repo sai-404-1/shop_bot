@@ -2,8 +2,9 @@
 .DS_Store
 test.py
 manager/db_test.py
-src/database.db
-
+*.png
+*.jpg
+*.db
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

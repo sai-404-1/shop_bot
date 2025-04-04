@@ -103,7 +103,20 @@ async def product_type_handler(callback: types.CallbackQuery, state: FSMContext)
 @dp.callback_query(F.data.startswith("product"))
 async def process_callback(callback: types.CallbackQuery, state: FSMContext):
     data = await state.get_data()
-    product = CRUD.for_model(Product).get(db_session, id=int(callback.data.split("__")[1]))[0]
+    #-------------------------------------------UPDATE START----------------------------------------------
+    product = CRUD.for_model(Product).get(db_session, id=int(callback.data.split("__")[1]))
+    # TODO: add condition (if product is empty())
+    # Need updates
+    if empty(product): 
+        callback.answer("Данная позиция уже выкуплена")
+        if data.get("isBasket") == False:
+            await cmd_start(callback, state)
+        else:
+            # TODO: delete all positions from basket with int(callback.data.split("__")[1]) == product.id
+            await basket(callback, state)
+        return
+    #-------------------------------------------UPDATE END----------------------------------------------
+    product = product[0]
     photo = types.FSInputFile(f"{photo_path}/{product.photo}")
 
     if data.get("isBasket") == False:
@@ -116,7 +129,17 @@ async def process_callback(callback: types.CallbackQuery, state: FSMContext):
         })
         keyboard = await keyboardFabric.createBeforeBasketKeyboard(state)
     else:
-        basket_position = CRUD.for_model(Basket).get(db_session, user_id=callback.from_user.id, products_id=product.id)[0]
+        #-------------------------------------------UPDATE START----------------------------------------------
+        basket_position = CRUD.for_model(Basket).get(db_session, user_id=callback.from_user.id, products_id=product.id)
+        # TODO: add condition (if basket_position is empty())
+        # Need updates
+        if empty(basket_position):
+            callback.answer("Данная позиция уже выкуплена")
+            # TODO: delete all positions from basket with int(callback.data.split("__")[1]) == product.id
+            await basket(callback, state)
+            return
+        basket_position = basket_position[0]
+        #-------------------------------------------UPDATE END----------------------------------------------
         await state.set_data({
             "isBasket": True,
             "productId": product.id,

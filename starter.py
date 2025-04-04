@@ -12,11 +12,8 @@ from aiogram import Router
 from aiogram.utils.deep_linking import create_start_link
 
 # Инициализация бота и диспетчера
-<<<<<<< HEAD
-TOKEN = "7992777592:AAFdMeBsbvwkz4lVAOT1uMPdP9w_MQK4XN4" #manager.get_token()
-=======
-TOKEN = "7543943279:AAG20NNnPm-SIOjVB43rbdHM_w4Gx8usEFM" #manager.get_token()
->>>>>>> 248c9ba (fix problem with get newest product)
+TOKEN = "8107506318:AAEdGyBoDxqXKMwxDdPezJ3lmv7KS_2ccbY" #manager.get_token()
+# TOKEN = "7543943279:AAG20NNnPm-SIOjVB43rbdHM_w4Gx8usEFM" #manager.get_token()
 db_session = Database('src/database.db').Session()
 photo_path = "src/photo"
 
