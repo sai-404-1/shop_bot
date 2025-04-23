@@ -16,7 +16,7 @@ async def copy1(message: types.Message, state: FSMContext):
         types.FSInputFile(
             f"{photo_path}/{product.photo}"
         ),
-        caption="{}\n\n{}\n\n{}".format(product.name, product.description, product.price),
+        caption="{}\n\nЦена: {}₽ \n\n{}".format(product.name, int(product.price), product.description),
         reply_markup=keyboard
     )
 

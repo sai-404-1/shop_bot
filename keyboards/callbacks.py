@@ -108,12 +108,11 @@ async def process_callback(callback: types.CallbackQuery, state: FSMContext):
     data = await state.get_data()
     #-------------------------------------------UPDATE START----------------------------------------------
     product = CRUD.for_model(Product).get(db_session, id=int(callback.data.split("__")[1]))[0]
-    # TODO: add condition (if product is empty())
     # Need updates
     print(product.name)
     print(product.id)
     print(product.description)
-    if empty(product): 
+    if product is None: 
         callback.answer("Данная позиция уже выкуплена")
         if data.get("isBasket") == False:
             await cmd_start(callback, state)
@@ -137,9 +136,8 @@ async def process_callback(callback: types.CallbackQuery, state: FSMContext):
     else:
         #-------------------------------------------UPDATE START----------------------------------------------
         basket_position = CRUD.for_model(Basket).get(db_session, user_id=callback.from_user.id, products_id=product.id)
-        # TODO: add condition (if basket_position is empty())
         # Need updates
-        if empty(basket_position):
+        if basket_position is None:
             callback.answer("Данная позиция уже выкуплена")
             # TODO: delete all positions from basket with int(callback.data.split("__")[1]) == product.id
             await basket(callback, state)
@@ -161,7 +159,7 @@ async def process_callback(callback: types.CallbackQuery, state: FSMContext):
         types.FSInputFile(
             f"{photo_path}/{product.photo}"
         ),
-        caption="{}\n\n{}\n\n[Ссылка на товар]({})".format(product.name, product.price, await create_start_link(bot, str(product.id))),
+        caption="{}\n\nЦена: {} ₽\n\n[Ссылка на товар]({})".format(product.name, int(product.price), await create_start_link(bot, str(product.id))),
         reply_markup=keyboard,
         parse_mode="Markdown"
     )
