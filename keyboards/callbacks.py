@@ -112,7 +112,7 @@ async def process_callback(callback: types.CallbackQuery, state: FSMContext):
     print(product.name)
     print(product.id)
     print(product.description)
-    if product is None: 
+    if product is None or (len(product) == 0): 
         callback.answer("Данная позиция уже выкуплена")
         if data.get("isBasket") == False:
             await cmd_start(callback, state)
@@ -137,7 +137,7 @@ async def process_callback(callback: types.CallbackQuery, state: FSMContext):
         #-------------------------------------------UPDATE START----------------------------------------------
         basket_position = CRUD.for_model(Basket).get(db_session, user_id=callback.from_user.id, products_id=product.id)
         # Need updates
-        if basket_position is None:
+        if basket_position is None  or (len(basket_position) == 0):
             callback.answer("Данная позиция уже выкуплена")
             # TODO: delete all positions from basket with int(callback.data.split("__")[1]) == product.id
             await basket(callback, state)
