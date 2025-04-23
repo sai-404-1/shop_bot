@@ -107,9 +107,12 @@ async def product_type_handler(callback: types.CallbackQuery, state: FSMContext)
 async def process_callback(callback: types.CallbackQuery, state: FSMContext):
     data = await state.get_data()
     #-------------------------------------------UPDATE START----------------------------------------------
-    product = CRUD.for_model(Product).get(db_session, id=int(callback.data.split("__")[1]))
+    product = CRUD.for_model(Product).get(db_session, id=int(callback.data.split("__")[1]))[0]
     # TODO: add condition (if product is empty())
     # Need updates
+    print(product.name)
+    print(product.id)
+    print(product.description)
     if empty(product): 
         callback.answer("Данная позиция уже выкуплена")
         if data.get("isBasket") == False:
