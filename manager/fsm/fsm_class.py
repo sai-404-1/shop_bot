@@ -23,3 +23,7 @@ class StatesForButtons(StatesGroup):
 class StatesForManager(StatesGroup):
     userCommunicate = State()
     managerCommunicate = State()
+
+class StatesForRegBasket(StatesGroup):
+    name = State()
+    phone_number = State()

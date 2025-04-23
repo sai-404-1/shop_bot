@@ -27,10 +27,12 @@ async def delete_product_with_type(callback: types.CallbackQuery, state: FSMCont
     type = CRUD.for_model(Type).get(db_session, id=int(data[1]))[0]
     CRUD.for_model(Type).update(db_session, model_id=type.id, rate=type.rate+1)
     await callback.message.edit_text(
-        text=f"Выберите продукт из категории {data[2]}",
-        reply_markup=keyboardFabric.createCustomInlineKeyboard([
-            InlineButton(text=f"{product.name}", callback_data=f'deleteProduct__{product.id}') for product in products
-        ])
+        text=f"Выберите продукт из категории {type.title} <b>для удаления</b>",
+        reply_markup=keyboardFabric.createKeyboardWithBackButton(
+            [InlineButton(text=f"{product.name}", callback_data=f'deleteProduct__{product.id}') for product in products],
+            "admin_menu_products"
+        ),
+        parse_mode='HTML'
     )
 
 @dp.callback_query(F.data.startswith('deleteProduct'))

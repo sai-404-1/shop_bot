@@ -29,10 +29,12 @@ async def change_product_with_type(callback: types.CallbackQuery, state: FSMCont
     type = CRUD.for_model(Type).get(db_session, id=int(data[1]))[0]
     CRUD.for_model(Type).update(db_session, model_id=type.id, rate=type.rate+1)
     await callback.message.edit_text(
-        text=f"Выберите продукт из категории {data[2]}",
-        reply_markup=keyboardFabric.createCustomInlineKeyboard([
-            InlineButton(text=f"{product.name}", callback_data=f'changeProduct__{product.id}') for product in products
-        ])
+        text=f"Выберите продукт из категории {type.title} <b>для изменения</b>",
+        reply_markup=keyboardFabric.createKeyboardWithBackButton(
+            [InlineButton(text=f"{product.name}", callback_data=f'changeProduct__{product.id}') for product in products],
+            "admin_menu_products"
+        ),
+        parse_mode='HTML'
     )
 
 @dp.callback_query(F.data.startswith('changeProduct'))
@@ -54,7 +56,7 @@ async def change_product(callback: types.CallbackQuery, state: FSMContext):
             InlineButton(text="Цена", callback_data=f"changePriceProduct__{product.id}"),
             InlineButton(text="Тип", callback_data=f"changeTypeProduct__{product.id}"),
             InlineButton(text="Фотография", callback_data=f"changePhotoProduct__{product.id}"),
-            InlineButton(text="Закрыть", callback_data="delete_message")
+            InlineButton(text="Назад", callback_data="admin_menu_products")
         ]),
         parse_mode="HTML"
     )

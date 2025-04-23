@@ -1,12 +1,15 @@
 import keyboards.keyboardFabric as keyboardFabric
 import keyboards.callbacks as inline_callbacks
+import keyboards.keyboardCallbacks as keyboard_callbacks
 import manager.fsm.fsm_handler as fsm_handler
 import keyboards.buttons as button_types
 import keyboards.change_product_callbacks as product_changer
 import keyboards.delete_product_callbacks as product_deleter
 
-import myUtils.Json as Json
+import myUtils.fastFunctions.buttons as fastFunctions_buttons
+import myUtils.fastFunctions as fastFunctions
 
+from aiogram.types import CallbackQuery
 from starter import *
 
 @dp.message(CommandStart(deep_link=True))
@@ -44,15 +47,37 @@ async def cmd_start(message: Message):
     else: user = user[0]
     
     # Creating /start menu
-    buttons = []
-    for button_data in dataset["main"] if user.role >= 1 else dataset["main"][:3]:
-        buttons.append(button_types.InlineButton(button_data[0], button_data[1]))
+    buttons = [[]]
+    for button_data in dataset["menu"]:
+        if button_data[0] not in ['Корзина']:
+            if len(buttons[-1]) < 2:
+                buttons[-1].append(button_types.KeyboardButtonRegular(button_data[0]))
+            else:
+                buttons.append([button_types.KeyboardButtonRegular(button_data[0])])
 
     await message.answer(
         text=dataset["message_texts"]["main"],
-        reply_markup=keyboardFabric.createCustomInlineKeyboard(buttons)
+        reply_markup=keyboardFabric.createCustomReplyKeyboard(buttons)
     )
 
+@dp.message(Command("admin"))
+async def cmd_basket(message: Message, state: FSMContext):
+    user = CRUD.for_model(Users).get(db_session, user_id=message.from_user.id)[0]
+    print(user, user.role, user.username)
+    if user.role >= 1: 
+        mes = await message.answer('.')
+        callback_query = CallbackQuery(
+            id="callback_query_id",
+            from_user=message.from_user,
+            chat_instance=str(mes.chat.id),
+            data="database_change",
+            message=mes
+        )
+        await fastFunctions_buttons.send_generated_message(callback_query)
+
+@dp.message(Command("basket"))
+async def cmd_basket(message: Message, state: FSMContext):
+    await fastFunctions_buttons.show_basket(user_id=message.from_user.id, state=state, message=message)
 
 if __name__ == "__main__":
     import asyncio

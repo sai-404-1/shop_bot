@@ -1,6 +1,8 @@
 {
     "message_texts": {
         "main": "Магазин техники\nг.Ставрополь\n-Trade-in / рассрочка / кредит\n- Покупка / продажа новых и б/у устройств\n- ремонт\n- аксессуары",
+        "database_change": "Панель администратора",
+        "admin_menu_products": "Изменение и создание товаров",
         "NaN": "Not a Message"
     },
 
@@ -12,7 +14,6 @@
 
     "main": [
         ["Меню", "menu"],
-        ["Корзина", "basket"],
         ["Запросы на помощь", "list_of_requests_help"],
         ["Работа с базой", "database_change"]
     ],
@@ -34,8 +35,8 @@
         ["Игровые приставки", "game_consoles"],
         ["Аксессуары", "accessories"],
         ["Корзина", "basket"],
-        ["Связь с менеджером", "manager"],
-        ["Доставка / оплата", "delivery"]
+        ["Доставка / оплата", "delivery"],
+        ["Связь с менеджером", "manager"]
     ],
 
     "new_devices": [
@@ -43,10 +44,7 @@
         ["Планшеты", "new_tablets"],
         ["Ноутбуки", "new_notebooks"],
         ["Часы", "new_watches"],
-        ["Наушники", "new_headphones"],
-        ["Связь с менеджером", "manager"],
-        ["Домой", "main"],
-        ["Доставка / оплата", "delivery"]
+        ["Наушники", "new_headphones"]
     ],
     
     "used_devices": [
@@ -54,10 +52,7 @@
         ["Планшеты", "used_tablets"],
         ["Ноутбуки", "used_notebooks"],
         ["Часы", "used_watches"],
-        ["Наушники", "used_headphones"],
-        ["Связь с менеджером", "manager"],
-        ["Домой", "main"],
-        ["Доставка / оплата", "delivery"]
+        ["Наушники", "used_headphones"]
     ],
 
     "beauty": [
@@ -83,7 +78,6 @@
         ["iPhone", "new_iphone"],
         ["Андроид", "new_android"],
         ["Связь с менеджером", "manager"],
-        ["Домой", "main"],
         ["Доставка / оплата", "delivery"]
     ],
 
@@ -91,7 +85,6 @@
         ["IPhone", "used_iphone"],
         ["Андроид", "used_android"],
         ["Связь с менеджером", "manager"],
-        ["Домой", "main"],
         ["Доставка / оплата", "delivery"]
     ],
 

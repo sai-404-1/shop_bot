@@ -40,6 +40,7 @@ class MessageGenerator:
         for button_data in self.getButtons():
             buttons.append(InlineButton(button_data[0], button_data[1]))
         # TODO: add condition: if getBackAction is not None -> create back button : if it is None -> not create custom keyboard
+        # print(self)
         if self.data == "main" or backAction is None:
             return keyboardFabric.createCustomInlineKeyboard(buttons)
         else:

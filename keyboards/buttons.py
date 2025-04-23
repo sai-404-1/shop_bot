@@ -1,4 +1,4 @@
-from aiogram.types import InlineKeyboardButton, KeyboardButton
+from aiogram.types import InlineKeyboardButton, KeyboardButton, ReplyKeyboardMarkup
 
 class Button:
     """Parent class for inline and keyboard buttons"""

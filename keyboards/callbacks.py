@@ -23,7 +23,7 @@ async def send_generated_message(callback):
 # ))
 # but before - add all jsons to db
 @dp.callback_query(F.data.in_([
-    "categories", "menu", "new_devices",
+    "categories", "new_devices",
     "used_devices", "beauty", "game_consoles",
     "accessories", "new_smartphones", "used_smartphones", 
 ]))
@@ -33,28 +33,31 @@ async def regenerate_button_callback(callback: types.CallbackQuery, state: FSMCo
 
 @dp.callback_query(F.data == "main")
 async def cmd_start(callback: types.CallbackQuery, state: FSMContext):
-    dataset = Json.getMainDataset()
-    message = callback.message
-    await state.clear()
+    try:
+        dataset = Json.getMainDataset()
+        message = callback.message
+        await state.clear()
 
-    # We are creating a new user if that not be was before
-    user = CRUD.for_model(Users).get(db_session, user_id=message.from_user.id)
-    if len(user) == 0:
-        user = CRUD.for_model(Users).create(db_session, 
-            username=message.from_user.username, 
-            user_id=message.from_user.id
+        # We are creating a new user if that not be was before
+        user = CRUD.for_model(Users).get(db_session, user_id=message.from_user.id)
+        if len(user) == 0:
+            user = CRUD.for_model(Users).create(db_session, 
+                username=message.from_user.username, 
+                user_id=message.from_user.id
+            )
+        else: user = user[0]
+        
+        # Creating /start menu
+        buttons = []
+        for button_data in dataset["main"] if user.role >= 1 else dataset["main"][:2]:
+            buttons.append(KeyboardButtonRegular(button_data[0]))
+
+        await message.edit_text(
+            text=dataset["message_texts"]["main"],
+            reply_markup=keyboardFabric.createCustomReplyKeyboard(buttons)
         )
-    else: user = user[0]
-    
-    # Creating /start menu
-    buttons = []
-    for button_data in dataset["main"] if user.role >= 1 else dataset["main"][:2]:
-        buttons.append(InlineButton(button_data[0], button_data[1]))
-
-    await message.edit_text(
-        text=dataset["message_texts"]["main"],
-        reply_markup=keyboardFabric.createCustomInlineKeyboard(buttons)
-    )
+    except:
+        await callback.answer('Ошибка')
 
 @dp.callback_query(F.data.in_(["database_change", "admin_menu_products"]))
 async def check_for_admin(callback: types.CallbackQuery, state: FSMContext):
@@ -87,7 +90,7 @@ async def product_type_handler(callback: types.CallbackQuery, state: FSMContext)
         except:
             pass
 
-    print(backAction)
+    # print(backAction)
 
     if callback.message.photo:
         await callback.message.delete()
@@ -172,25 +175,8 @@ async def add_to_basket(callback: types.CallbackQuery, state: FSMContext):
     F.data == "basket"
 )
 async def basket(callback: types.CallbackQuery, state: FSMContext):
-    basket = CRUD.for_model(Basket).get(db_session, user_id=callback.from_user.id)
-    buttons = []
-    text = ""
-    for basket_position in basket:
-        product = CRUD.for_model(Product).get(db_session, id=basket_position.products_id)[0]
-        quantity = basket_position.quantity
-        buttons.append(
-            InlineButton(
-                product.name, 
-                str(product.id)
-            )
-        )
-        text += f"Товар: {product.name} \nКол-во: {quantity}\n\n"
-    await state.set_data({
-        "isBasket": True,
-    })
-    keyboard = keyboardFabric.createKeyboardWithBackButton(buttons, "main")
-    await callback.message.delete()
-    await callback.message.answer("Ваша корзина:\n\n"+text, reply_markup=keyboard)
+    from myUtils.fastFunctions.buttons import show_basket
+    await show_basket(user_id=callback.from_user.id, state=state, message=callback)
 
 @dp.callback_query(F.data == "remove_from_basket")
 async def remove_from_basket(callback: types.CallbackQuery, state: FSMContext):
@@ -205,11 +191,13 @@ async def manager(callback: types.CallbackQuery, state: FSMContext):
         CRUD.for_model(Communication).create(db_session, user_id=callback.from_user.id)
         chat = CRUD.for_model(Communication).get(db_session, user_id=callback.from_user.id)
     chat = chat[0]
-    await callback.message.delete()
-    await callback.message.answer(
-        "Вы перешли в чат с поддержкой.\nПожалуйста, опишите вашу проблему и ожидайте ответа", 
-        reply_markup=keyboardFabric.createKeyboardWithBackButton([], "main")
-    )
+    await callback.message.edit_text(
+        "Вы перешли в чат с поддержкой.\nПожалуйста, опишите ваш вопрос и ожидайте ответа", 
+        reply_markup=keyboardFabric.createCustomInlineKeyboard([
+            InlineButton(
+                "Отменить",
+                "delete_message"
+    )]))
     await state.set_state(StatesForManager.userCommunicate)
 
 async def sendLastMessages(callback: types.CallbackQuery, messages: list, amount: int = 20) -> None:
@@ -328,6 +316,21 @@ async def create_product(callback: types.CallbackQuery, state: FSMContext):
 @dp.callback_query(F.data == "delete_message")
 async def delete_message(callback: types.CallbackQuery):
     await callback.message.delete()
+
+@dp.callback_query(F.data == "menu")
+async def fucking_plug(callback: types.CallbackQuery):
+    await callback.answer("Вы в самом начале")
+
+@dp.callback_query(F.data == "register_basket")
+async def register_basket(callback: types.CallbackQuery, state: FSMContext):
+    await callback.message.delete()
+    current_message = await callback.message.answer("Введите ваше имя: как к вам обращаться?")
+    data = await state.get_data()
+    data.update({
+        'current_message': current_message
+    })
+    await state.set_data(data)
+    await state.set_state(StatesForRegBasket.name)
 
 @callback_router.callback_query()
 async def handle_unknown_callback(callback: types.CallbackQuery):

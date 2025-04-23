@@ -22,15 +22,17 @@ def createCustomInlineKeyboard(buttons: list[Button]) -> InlineKeyboardMarkup:
     for buttonData in buttons:
         button = buttonData.create()
         keyboard.row(button)
-    print(keyboard)
+    # print(keyboard)
     return keyboard.as_markup()
 
-def createCustomReplyKeyboard(buttons: list[Button]) -> ReplyKeyboardMarkup:
+def createCustomReplyKeyboard(buttons: list[list[Button]]) -> ReplyKeyboardMarkup:
     keyboard = ReplyKeyboardBuilder()
 
-    for buttonData in buttons:
-        button = buttonData.create()
-        keyboard.add(button)
+    for row in buttons:
+        for button_data in row:
+            button = button_data.create()
+            keyboard.add(button)
+        keyboard.adjust(2)  # По 2 кнопки в ряду
     
     return keyboard.as_markup(resize_keyboard=True)
 
