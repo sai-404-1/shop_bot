@@ -14,7 +14,11 @@ import myUtils.Json as Json
 
 # Инициализация бота и диспетчера
 TOKEN = "8107506318:AAEdGyBoDxqXKMwxDdPezJ3lmv7KS_2ccbY" #manager.get_token()
+<<<<<<< HEAD
 # TOKEN = "7816677166:AAF_ppIzs1oPRV3-agwb5Xeb8sVGX-3fm1o"
+=======
+# TOKEN = "7543943279:AAG20NNnPm-SIOjVB43rbdHM_w4Gx8usEFM" #manager.get_token()
+>>>>>>> 168383675d2b2b770a29ac1685f7ab29f4bea04d
 db_session = Database('src/database.db').Session()
 photo_path = "src/photo"
 
