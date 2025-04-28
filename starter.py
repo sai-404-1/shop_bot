@@ -11,6 +11,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram import Router
 from aiogram.utils.deep_linking import create_start_link
 import myUtils.Json as Json
+from myUtils.fastFunctions.photo_service import MediaGroupMiddleware
 
 # Инициализация бота и диспетчера
 # TOKEN = "8107506318:AAEdGyBoDxqXKMwxDdPezJ3lmv7KS_2ccbY" 
@@ -31,6 +32,7 @@ dp.include_router(callback_router)
 
 # Запуск бота
 async def main():
+    dp.message.middleware(MediaGroupMiddleware())
     await dp.start_polling(bot)
 
 if __name__ == "__main__":

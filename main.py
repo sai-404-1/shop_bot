@@ -41,7 +41,7 @@ async def cmd_start(message: Message):
     user = CRUD.for_model(Users).get(db_session, user_id=message.from_user.id)
     if len(user) == 0:
         user = CRUD.for_model(Users).create(db_session, 
-            username=message.from_user.username, 
+            username=message.from_user.username if message.from_user.username != None else " ", 
             user_id=message.from_user.id
         )
     else: user = user[0]
@@ -74,6 +74,11 @@ async def cmd_basket(message: Message, state: FSMContext):
             message=mes
         )
         await fastFunctions_buttons.send_generated_message(callback_query)
+
+@dp.message(Command("test"))
+async def test(message: Message, state: FSMContext):
+    await state.set_state(StatesForCreate.product_photo)
+    await message.answer("Now send me many different photo")
 
 @dp.message(Command("basket"))
 async def cmd_basket(message: Message, state: FSMContext):
