@@ -73,23 +73,39 @@ async def message_try(callback: types.CallbackQuery, state: FSMContext):
     await state.set_state(StatesForCreate.product_photo)
     await data['product_create_progress'].edit_text(await create_progress_message(data))
 
+async def photo_getter(photo):
+    file_id = photo.file_id
+    file = await bot.get_file(file_id)
+    print(file, file.file_path)
+
+    await bot.download_file(
+        file_path=file.file_path,
+        destination=f"src/photo/{file_id}.jpg"
+    )
+
+
 @fsm_router.message(StatesForCreate.product_photo)
-async def message_try(message: Message, state: FSMContext, bot: Bot):
+async def message_try(message: Message, album: list[Message], state: FSMContext, bot: Bot):
     data = await state.get_data()
 
     data.update({'product_photo': "Скачиваю..."})
     await data['product_create_progress'].edit_text(await create_progress_message(data))
     await data.get('current_message').delete()
-    
-    file_id = message.photo[-1].file_id
-    file = await bot.get_file(file_id)
-    await bot.download_file(
-        file_path=file.file_path,
-        destination=f"src/photo/{file_id}.jpg"
-    )
-    data.update({'product_photo': f"{file_id[:10]}..."})
-    await data['product_create_progress'].edit_text(await create_progress_message(data))
 
+    photos = []
+    for element in album:
+        if element.photo:
+            file_id = element.photo.file_id
+            photos.append(f"{file_id}.jpg")
+            file = await bot.get_file(file_id)
+            await bot.download_file(
+                file_path=file.file_path,
+                destination=f"src/photo/{file_id}.jpg"
+            )
+
+    data.update({'product_photo': f"{photos}/{len(element.photo)}"})
+    await data['product_create_progress'].edit_text(await create_progress_message(data))
+    
     product = CRUD.for_model(Product).create(
         db_session,
         name=data.get("product_name"),
