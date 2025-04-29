@@ -7,6 +7,7 @@ import keyboards.keyboardFabric as keyboardFabric
 import keyboards.messageGenerator as messageGenerator
 
 from myUtils import Json
+from myUtils.fastFunctions import text
 
 # user functions
 async def send_generated_message(callback):
@@ -69,6 +70,14 @@ async def check_for_admin(callback: types.CallbackQuery, state: FSMContext):
     [obj.name for obj in CRUD.for_model(Type).get(db_session)]
 ))
 async def product_type_handler(callback: types.CallbackQuery, state: FSMContext):
+    try:
+        data = await state.get_data()
+        data = data.get("for_delete")
+        for msg in data:
+            await bot.delete_message(chat_id=msg[0], message_id=msg[1])
+    except Exception as e:
+        print(f"Error until atempt try delete: {e}")
+
     type_id = CRUD.for_model(Type).get(db_session, name=callback.data)[0].id
     products = CRUD.for_model(Product).get(db_session, type_id=type_id)
     buttons = []
@@ -96,7 +105,8 @@ async def product_type_handler(callback: types.CallbackQuery, state: FSMContext)
         await callback.message.delete()
         await callback.message.answer(tg.getMessagePart(), reply_markup=keyboardFabric.createKeyboardWithBackButton(buttons, backAction))
     else:
-        await callback.message.edit_text(tg.getMessagePart(), reply_markup=keyboardFabric.createKeyboardWithBackButton(buttons, backAction))
+        # print(len(buttons))
+        await callback.message.edit_text(tg.getMessagePart(), reply_markup=keyboardFabric.createKeyboardWithBackButton(buttons[:31], backAction))
     
     await state.clear()
     await state.set_data({
@@ -107,11 +117,11 @@ async def product_type_handler(callback: types.CallbackQuery, state: FSMContext)
 async def process_callback(callback: types.CallbackQuery, state: FSMContext):
     data = await state.get_data()
     #-------------------------------------------UPDATE START----------------------------------------------
-    product = CRUD.for_model(Product).get(db_session, id=int(callback.data.split("__")[1]))[0]
+    product = CRUD.for_model(Product).get(db_session, id=int(callback.data.split("__")[1]))
     # Need updates
-    print(product.name)
-    print(product.id)
-    print(product.description)
+    # print(product.name)
+    # print(product.id)
+    # print(product.description)
     if product is None or (len(product) == 0): 
         callback.answer("Данная позиция уже выкуплена")
         if data.get("isBasket") == False:
@@ -122,7 +132,13 @@ async def process_callback(callback: types.CallbackQuery, state: FSMContext):
         return
     #-------------------------------------------UPDATE END----------------------------------------------
     product = product[0]
-    photo = types.FSInputFile(f"{photo_path}/{product.photo}")
+    # photo = types.FSInputFile(f"{photo_path}/{product.photo}")
+    # Список фотографий для отправки
+    media = []
+    for photo in product.photo:
+        media.append(
+            InputMediaPhoto(media=FSInputFile(f"{photo_path}/{photo}"))  # Используем FSInputFile для локальных файлов
+        )
 
     if data.get("isBasket") == False:
         buttons = []
@@ -155,11 +171,15 @@ async def process_callback(callback: types.CallbackQuery, state: FSMContext):
         pass
 
     await callback.message.delete()
-    await callback.message.answer_photo(
-        types.FSInputFile(
-            f"{photo_path}/{product.photo}"
-        ),
-        caption="{}\n\nЦена: {} ₽\n\n[Ссылка на товар]({})".format(product.name, int(product.price), await create_start_link(bot, str(product.id))),
+    sent_messages = await callback.message.answer_media_group(media=media)
+    data = await state.get_data()
+    data.update({"for_delete": [[msg.chat.id, msg.message_id] for msg in sent_messages]})
+    await state.set_data(data)
+
+    # for msg in sent_messages:
+    #     await bot.delete_message(chat_id=msg.chat.id, message_id=msg.message_id)
+    await callback.message.answer(
+        "{}\n\n[Ссылка на товар]({})".format(text.insert_after_first_line(product.name, f"Цена: {product.price}₽"), await create_start_link(bot, str(product.id))),
         reply_markup=keyboard,
         parse_mode="Markdown"
     )
@@ -178,6 +198,13 @@ async def change_quantity(callback: types.CallbackQuery, state: FSMContext):
 )
 async def add_to_basket(callback: types.CallbackQuery, state: FSMContext):
     user_id = callback.from_user.id
+    try:
+        data = await state.get_data()
+        data = data.get("for_delete")
+        for msg in data:
+            await bot.delete_message(chat_id=msg[0], message_id=msg[1])
+    except Exception as e:
+        print(f"Error until atempt try delete: {e}")
     product_id = (await state.get_data())["productId"]
     quantity = (await state.get_data())["currQuantity"]
     basket = CRUD.for_model(Basket).get(db_session, user_id=user_id, products_id=product_id)
@@ -355,7 +382,16 @@ async def register_basket(callback: types.CallbackQuery, state: FSMContext):
     await state.set_state(StatesForRegBasket.name)
 
 @callback_router.callback_query()
-async def handle_unknown_callback(callback: types.CallbackQuery):
+async def handle_unknown_callback(callback: types.CallbackQuery, state: FSMContext):
+
+    try:
+        data = await state.get_data()
+        data = data.get("for_delete")
+        for msg in data:
+            await bot.delete_message(chat_id=msg[0], message_id=msg[1])
+    except Exception as e:
+        print(f"Error until atempt try delete: {e}")
+
     await callback.message.answer(
         text=f"⚠️ {callback.data.title()}\n Эта кнопка пока не работает.",
         reply_markup=keyboardFabric.createCustomInlineKeyboard([

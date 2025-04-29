@@ -32,8 +32,8 @@ class Product(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String, nullable=False)
     description = Column(String, nullable=False)
-    photo = Column(String, nullable=True)
-    price = Column(Float, nullable=False)
+    photo = Column(JSON, nullable=True)
+    price = Column(String, nullable=False)
     type_id = Column(Integer, ForeignKey("type.id"), nullable=True)
     quantity = Column(Integer, default=1)
 

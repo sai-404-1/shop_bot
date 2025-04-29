@@ -95,13 +95,16 @@ async def message_try(message: Message, album: list[Message], state: FSMContext,
     photos = []
     for element in album:
         if element.photo:
-            file_id = element.photo.file_id
+            file_id = element.photo[-1].file_id
             photos.append(f"{file_id}.jpg")
             file = await bot.get_file(file_id)
             await bot.download_file(
                 file_path=file.file_path,
                 destination=f"src/photo/{file_id}.jpg"
             )
+    # import json
+    # result = json.dumps(photos)
+    # print(result, type(result))
 
     data.update({'product_photo': f"{photos}/{len(element.photo)}"})
     await data['product_create_progress'].edit_text(await create_progress_message(data))
@@ -110,7 +113,7 @@ async def message_try(message: Message, album: list[Message], state: FSMContext,
         db_session,
         name=data.get("product_name"),
         description="",
-        photo=f"{file_id}.jpg",
+        photo=photos,
         price=data.get("product_price"),
         type_id=\
         CRUD.for_model(Type).get(db_session, name=data.get("product_type"))[0].id
@@ -124,4 +127,5 @@ async def message_try(message: Message, album: list[Message], state: FSMContext,
                 "delete_message"
     )]))
     await state.clear()
-    await message.delete()
+    for photo in album:
+        await photo.delete()

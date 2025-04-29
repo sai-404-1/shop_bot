@@ -5,7 +5,7 @@ from keyboards import keyboardFabric
 
 from aiogram import Bot, Dispatcher, types
 from aiogram.filters import Command, CommandStart, CommandObject
-from aiogram.types import Message
+from aiogram.types import Message, InputMediaPhoto, FSInputFile
 from aiogram import F
 from aiogram.fsm.context import FSMContext
 from aiogram import Router
@@ -14,8 +14,8 @@ import myUtils.Json as Json
 from myUtils.fastFunctions.photo_service import MediaGroupMiddleware
 
 # Инициализация бота и диспетчера
-# TOKEN = "8107506318:AAEdGyBoDxqXKMwxDdPezJ3lmv7KS_2ccbY" 
-TOKEN = "7816677166:AAF_ppIzs1oPRV3-agwb5Xeb8sVGX-3fm1o"
+TOKEN = "8107506318:AAEdGyBoDxqXKMwxDdPezJ3lmv7KS_2ccbY" 
+# TOKEN = "7816677166:AAF_ppIzs1oPRV3-agwb5Xeb8sVGX-3fm1o"
 # TOKEN = "7543943279:AAG20NNnPm-SIOjVB43rbdHM_w4Gx8usEFM" #manager.get_token()
 db_session = Database('src/database.db').Session()
 photo_path = "src/photo"
@@ -36,4 +36,5 @@ async def main():
     await dp.start_polling(bot)
 
 if __name__ == "__main__":
-    from manager import for_restore
+    # from manager import for_restore
+    from manager import change_type
