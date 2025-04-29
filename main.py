@@ -23,14 +23,32 @@ async def cmd_start_arguments(message: Message, command: CommandObject, state: F
     })
     keyboard = await keyboardFabric.createBeforeBasketKeyboard(state)
     await message.delete()
-    await message.answer_photo(
-        types.FSInputFile(
-            f"{photo_path}/{product.photo}"
-        ),
-        caption="{}\n\n{}\n\n[Ссылка на товар]({})".format(product.name, product.price, await create_start_link(bot, str(product.id))),
+
+    media = []
+    for photo in product.photo:
+        media.append(
+            InputMediaPhoto(media=FSInputFile(f"{photo_path}/{photo}"))  # Используем FSInputFile для локальных файлов
+        )
+
+    sent_messages = await message.answer_media_group(media=media)
+    data = await state.get_data()
+    data.update({"for_delete": [[msg.chat.id, msg.message_id] for msg in sent_messages]})
+    await state.set_data(data)
+
+    await message.answer(
+        "{}\n\n[Ссылка на товар]({})".format(fastFunctions.text.insert_after_first_line(product.name, f"Цена: {product.price}₽"), await create_start_link(bot, str(product.id))),
         reply_markup=keyboard,
         parse_mode="Markdown"
     )
+
+    # await message.answer_photo(
+    #     types.FSInputFile(
+    #         f"{photo_path}/{product.photo}"
+    #     ),
+    #     caption="{}\n\n{}\n\n[Ссылка на товар]({})".format(product.name, product.price, await create_start_link(bot, str(product.id))),
+    #     reply_markup=keyboard,
+    #     parse_mode="Markdown"
+    # )
 
 
 @dp.message(CommandStart())

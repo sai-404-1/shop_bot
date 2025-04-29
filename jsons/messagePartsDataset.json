@@ -2,5 +2,32 @@
     "NaN": "Not a Message",
 
     "apple": "Apple phones:",
-    "android": "Android phones:"
+    "android": "Android phones:",
+    "used_tablets": "Б/у планшеты",
+    "used_notebooks": "Б/у ноутбуки",
+    "used_watches": "Б/у часы",
+    "used_headphones": "Б/у наушники",
+    
+    "new_tablets": "Новые планшеты",
+    "new_notebooks": "Новые ноутбуки",
+    "new_watches": "Новые часы",
+    "new_headphones": "Новые наушники",
+    
+    "dyson_styler": "Стайлеры Dyson",
+    "dyson_straightener": "Выпрямители Dyson",
+    "dyson_hair_dryer": "Фены Dyson",
+    
+    "ps": "PlayStation",
+    "xbox": "Xbox",
+    
+    "chargers": "Зарядные устройства",
+    "cases": "Чехлы",
+    "glasses": "Защитные стекла",
+    "speakers": "Колонки",
+    "etc": "Другие аксессуары",
+    
+    "new_iphone": "Новые iPhone",
+    "new_android": "Новые Android-смартфоны",
+    "used_iphone": "Б/у iPhone",
+    "used_android": "Б/у Android-смартфоны"
 }
