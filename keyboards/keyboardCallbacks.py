@@ -1,6 +1,6 @@
 from starter import *
 
-from aiogram.utils.keyboard import InlineKeyboardMarkup
+from aiogram.utils.keyboard import InlineKeyboardMarkup, ReplyKeyboardBuilder, InlineKeyboardBuilder
 
 from .buttons import *
 import keyboards.keyboardFabric as keyboardFabric
@@ -19,19 +19,13 @@ async def buttons_header(message: Message, state: FSMContext):
         await show_basket(user_id=message.from_user.id, state=state, message=message)
     
     elif message.text == "Связь с менеджером":
-        chat = CRUD.for_model(Communication).get(db_session, user_id=message.from_user.id)
-        if len(chat) == 0:
-            CRUD.for_model(Communication).create(db_session, user_id=message.from_user.id)
-            chat = CRUD.for_model(Communication).get(db_session, user_id=message.from_user.id)
-        chat = chat[0]
-        await message.answer(
-            "Вы перешли в чат с поддержкой.\nПожалуйста, опишите ваш вопрос и ожидайте ответа", 
-            reply_markup=keyboardFabric.createCustomInlineKeyboard([
-                InlineButton(
-                    "Отменить",
-                    "delete_message"
-        )]))
-        await state.set_state(StatesForManager.userCommunicate)
+        keyboard = InlineKeyboardBuilder()
+        keyboard.row(InlineKeyboardButton(text="WhatsApp", url="https://wa.me/79887485869"))
+        keyboard.row(InlineKeyboardButton(text="Telegram", url="https://t.me/jxc_kmp"))
+        keyboard.row(InlineKeyboardButton(text="Связаться по номеру", callback_data="send_contact"))
+        keyboard.row(InlineKeyboardButton(text="Назад", callback_data="main"))
+        await message.answer(text="Выберете средство связи", reply_markup=keyboard.as_markup())
+
     
     elif message.text == "Доставка / оплата":
         # TODO добавить возможность выбора товара для оформления и последующую его обработку

@@ -3,6 +3,7 @@ from starter import *
 from aiogram.utils.keyboard import InlineKeyboardMarkup
 
 from .buttons import *
+import keyboards.buttons as button_types
 import keyboards.keyboardFabric as keyboardFabric
 import keyboards.messageGenerator as messageGenerator
 
@@ -35,29 +36,37 @@ async def regenerate_button_callback(callback: types.CallbackQuery, state: FSMCo
 @dp.callback_query(F.data == "main")
 async def cmd_start(callback: types.CallbackQuery, state: FSMContext):
     try:
-        dataset = Json.getMainDataset()
         message = callback.message
-        await state.clear()
+        dataset = Json.getMainDataset()
 
         # We are creating a new user if that not be was before
         user = CRUD.for_model(Users).get(db_session, user_id=message.from_user.id)
         if len(user) == 0:
             user = CRUD.for_model(Users).create(db_session, 
-                username=message.from_user.username, 
+                username=message.from_user.username if message.from_user.username != None else " ", 
                 user_id=message.from_user.id
             )
         else: user = user[0]
         
         # Creating /start menu
-        buttons = []
-        for button_data in dataset["main"] if user.role >= 1 else dataset["main"][:2]:
-            buttons.append(KeyboardButtonRegular(button_data[0]))
+        buttons = [[]]
+        for button_data in dataset["menu"]:
+            if button_data[0] not in ['Корзина']:
+                if len(buttons[-1]) < 2:
+                    buttons[-1].append(button_types.KeyboardButtonRegular(button_data[0]))
+                else:
+                    buttons.append([button_types.KeyboardButtonRegular(button_data[0])])
 
-        await message.edit_text(
+        await bot.delete_message(
+            chat_id=callback.from_user.id,
+            message_id=callback.message.message_id    
+        )
+        await message.answer(
             text=dataset["message_texts"]["main"],
             reply_markup=keyboardFabric.createCustomReplyKeyboard(buttons)
         )
-    except:
+    except Exception as e:
+        print(e)
         await callback.answer('Ошибка')
 
 @dp.callback_query(F.data.in_(["database_change", "admin_menu_products"]))
@@ -65,6 +74,51 @@ async def check_for_admin(callback: types.CallbackQuery, state: FSMContext):
     user = CRUD.for_model(Users).get(db_session, user_id=callback.from_user.id)[0]
     if user.role < 1: await callback.message.delete()
     else: await send_generated_message(callback)
+
+# TODO: 
+def get_pagination_keyboard(page: int, type_id: int) -> InlineKeyboardMarkup:
+    products = CRUD.for_model(Product).get(db_session, type_id=type_id)
+    buttons = []
+    for product in products:
+        buttons.append(
+            InlineButton(
+                product.name, f"product__{product.id}"
+            )
+        )
+
+    return keyboardFabric.createPaginationKeyboard(buttons, page)
+
+# TODO
+@dp.callback_query(F.data == "pagination_back")
+async def pagination_back(callback: types.CallbackQuery, state: FSMContext):
+    data = await state.get_data()
+    await state.set_data({
+        "page": data["page"] - 1,
+        "type_id": data["type_id"],
+        "cd": data["cd"]
+    })
+    keyboard = get_pagination_keyboard(data["page"] - 1, data["type_id"])
+    tg = messageGenerator.TextGenerator(data["cd"])
+    await callback.message.edit_text(tg.getMessagePart(), reply_markup=keyboard)
+
+# TODO
+@dp.callback_query(F.data == "pagination_forward")
+async def pagination_forward(callback: types.CallbackQuery, state: FSMContext):
+    data = await state.get_data()
+    await state.set_data({
+        "page": data["page"] + 1,
+        "type_id": data["type_id"],
+        "cd": data["cd"]
+    })
+    keyboard = get_pagination_keyboard(data["page"] + 1, data["type_id"])
+    tg = messageGenerator.TextGenerator(data["cd"])
+    await callback.message.edit_text(tg.getMessagePart(), reply_markup=keyboard)
+
+# TODO
+@dp.callback_query(F.data == "nothing")
+async def Noting(callback: types.CallbackQuery, state: FSMContext):
+    # just nothing
+    pass
 
 @dp.callback_query(F.data.in_(
     [obj.name for obj in CRUD.for_model(Type).get(db_session)]
@@ -78,13 +132,7 @@ async def product_type_handler(callback: types.CallbackQuery, state: FSMContext)
     except Exception as e:
         print(f"Error until atempt try delete: {e}")
 
-    type_id = CRUD.for_model(Type).get(db_session, name=callback.data)[0].id
-    products = CRUD.for_model(Product).get(db_session, type_id=type_id)
-    buttons = []
     tg = messageGenerator.TextGenerator(callback.data)
-
-    for product in products:
-        buttons.append(InlineButton(product.name, f"product__{product.id}"))
     
     backAction = "pupupu"
     dataset = Json.getMainDataset()
@@ -99,29 +147,28 @@ async def product_type_handler(callback: types.CallbackQuery, state: FSMContext)
         except:
             pass
 
-    # print(backAction)
+    # TODO: Change
+    type_id = CRUD.for_model(Type).get(db_session, name=callback.data)[0].id
+    keyboard = get_pagination_keyboard(0, type_id)
 
     if callback.message.photo:
         await callback.message.delete()
-        await callback.message.answer(tg.getMessagePart(), reply_markup=keyboardFabric.createKeyboardWithBackButton(buttons, backAction))
+        await callback.message.answer(tg.getMessagePart(), reply_markup=keyboard)
     else:
-        # print(len(buttons))
-        await callback.message.edit_text(tg.getMessagePart(), reply_markup=keyboardFabric.createKeyboardWithBackButton(buttons[:31], backAction))
+        await callback.message.edit_text(tg.getMessagePart(), reply_markup=keyboard)
     
     await state.clear()
     await state.set_data({
-        "isBasket": False
+        "isBasket": False,
+        "page": 0,
+        "type_id": type_id,
+        "cd": callback.data
     })
 
 @dp.callback_query(F.data.startswith("product"))
 async def process_callback(callback: types.CallbackQuery, state: FSMContext):
     data = await state.get_data()
-    #-------------------------------------------UPDATE START----------------------------------------------
     product = CRUD.for_model(Product).get(db_session, id=int(callback.data.split("__")[1]))
-    # Need updates
-    # print(product.name)
-    # print(product.id)
-    # print(product.description)
     if product is None or (len(product) == 0): 
         callback.answer("Данная позиция уже выкуплена")
         if data.get("isBasket") == False:
@@ -130,9 +177,7 @@ async def process_callback(callback: types.CallbackQuery, state: FSMContext):
             # TODO: delete all positions from basket with int(callback.data.split("__")[1]) == product.id
             await basket(callback, state)
         return
-    #-------------------------------------------UPDATE END----------------------------------------------
     product = product[0]
-    # photo = types.FSInputFile(f"{photo_path}/{product.photo}")
     # Список фотографий для отправки
     media = []
     for photo in product.photo:
@@ -150,16 +195,13 @@ async def process_callback(callback: types.CallbackQuery, state: FSMContext):
         })
         keyboard = await keyboardFabric.createBeforeBasketKeyboard(state)
     else:
-        #-------------------------------------------UPDATE START----------------------------------------------
         basket_position = CRUD.for_model(Basket).get(db_session, user_id=callback.from_user.id, products_id=product.id)
-        # Need updates
         if basket_position is None  or (len(basket_position) == 0):
             callback.answer("Данная позиция уже выкуплена")
             # TODO: delete all positions from basket with int(callback.data.split("__")[1]) == product.id
             await basket(callback, state)
             return
         basket_position = basket_position[0]
-        #-------------------------------------------UPDATE END----------------------------------------------
         await state.set_data({
             "isBasket": True,
             "productId": product.id,
@@ -176,8 +218,6 @@ async def process_callback(callback: types.CallbackQuery, state: FSMContext):
     data.update({"for_delete": [[msg.chat.id, msg.message_id] for msg in sent_messages]})
     await state.set_data(data)
 
-    # for msg in sent_messages:
-    #     await bot.delete_message(chat_id=msg.chat.id, message_id=msg.message_id)
     await callback.message.answer(
         "{}\n\n[Ссылка на товар]({})".format(text.insert_after_first_line(product.name, f"Цена: {product.price}₽"), await create_start_link(bot, str(product.id))),
         reply_markup=keyboard,
@@ -235,117 +275,14 @@ async def remove_from_basket(callback: types.CallbackQuery, state: FSMContext):
 
 @dp.callback_query(F.data == "manager")
 async def manager(callback: types.CallbackQuery, state: FSMContext):
-    chat = CRUD.for_model(Communication).get(db_session, user_id=callback.from_user.id)
-    if len(chat) == 0:
-        CRUD.for_model(Communication).create(db_session, user_id=callback.from_user.id)
-        chat = CRUD.for_model(Communication).get(db_session, user_id=callback.from_user.id)
-    chat = chat[0]
-    await callback.message.edit_text(
-        "Вы перешли в чат с поддержкой.\nПожалуйста, опишите ваш вопрос и ожидайте ответа", 
-        reply_markup=keyboardFabric.createCustomInlineKeyboard([
-            InlineButton(
-                "Отменить",
-                "delete_message"
-    )]))
-    await state.set_state(StatesForManager.userCommunicate)
-
-async def sendLastMessages(callback: types.CallbackQuery, messages: list, amount: int = 20) -> None:
-    if amount > len(messages):
-        amount = len(messages)
-    messages = messages[-amount:]
-    for message in messages:
-        await callback.message.answer(
-            "{}:\n{}".format(message[0], message[1])
-        )
-
-# for admins
-@dp.callback_query(F.data.contains("//support//"))
-async def support(callback: types.CallbackQuery, state: FSMContext):
-    import json
-    user_id = int(callback.data.split("//support//")[1])
-    chat = CRUD.for_model(Communication).get(db_session, user_id=user_id)[0]
-    CRUD.for_model(Communication).update(db_session, chat.id, readed=True)
-    await sendLastMessages(callback, json.loads(chat.messages), amount=1)
-    await callback.message.answer(
-        "Вы перешли в чат с пользователем {}.\nОтправьте ответ на его вопрос".format(user_id),
-        reply_markup=keyboardFabric.createKeyboardWithBackButton(
-            [InlineButton("Последние 20 сообщений", "history")], "main"
-        )
-    )
-    await state.set_state(StatesForManager.managerCommunicate)
-    await state.set_data({
-        "userId": user_id,
-    })
-
-# for users
-@dp.callback_query(F.data.contains("//help//"))
-async def help(callback: types.CallbackQuery,state: FSMContext):
-    await callback.message.delete()
-    await callback.message.answer(
-        "Вы перешли в чат с поддержкой.\nЕсли у вас остались вопросы - задайте их", 
-        reply_markup=keyboardFabric.createKeyboardWithBackButton(
-            [InlineButton("Последние 20 сообщений", "history")], "main"
-        )
-    )
-    await state.set_data({
-        "userId": callback.from_user.id
-    })
-    await state.set_state(StatesForManager.userCommunicate)
-    print(callback.data)
-
-@dp.callback_query(F.data == "history")
-async def history(callback: types.CallbackQuery, state: FSMContext):
-    import json
-    user_id = (await state.get_data())["userId"]
-    chat = CRUD.for_model(Communication).get(db_session, user_id=user_id)[0]
-    await sendLastMessages(callback, json.loads(chat.messages))
+    keyboard = InlineKeyboardBuilder()
+    keyboard.row(InlineKeyboardButton(text="WhatsApp", url="https://wa.me/79887485869"))
+    keyboard.row(InlineKeyboardButton(text="Telegram", url="https://t.me/jxc_kmp"))
+    keyboard.row(InlineKeyboardButton(text="Связаться по номеру", callback_data="send_contact"))
+    keyboard.row(InlineKeyboardButton(text="Назад", callback_data="main"))
+    await message.answer(text="Выберете средство связи", reply_markup=keyboard.as_markup())
 
 # admin functions
-def get_pagination_keyboard(page: int) -> InlineKeyboardMarkup:
-    chats = CRUD.for_model(Communication).get(db_session)
-    chats = sorted(chats, key=lambda chat: chat.readed)
-    buttons = []
-    for chat in chats:
-        buttons.append(
-            InlineButton(
-                text="{} - {}".format(chat.user_id, '✅' if chat.readed else '❌'),
-                callback_data="//support//{}".format(chat.user_id)
-            )
-        )
-    return keyboardFabric.createPaginationKeyboard(buttons, page)
-
-# admin functions
-@dp.callback_query(F.data == "list_of_requests_help") 
-async def list_of_requests_help(callback: types.CallbackQuery, state: FSMContext):
-    await state.set_data({
-        "page": 0,
-    })
-    keyboard = get_pagination_keyboard(0)
-    await callback.message.edit_text("Список чатов", reply_markup=keyboard)
-
-@dp.callback_query(F.data == "pagination_back")
-async def pagination_back(callback: types.CallbackQuery, state: FSMContext):
-    data = await state.get_data()
-    await state.set_data({
-        "page": data["page"] - 1
-    })
-    keyboard = get_pagination_keyboard(data["page"] - 1)
-    await callback.message.edit_text("Список чатов", reply_markup=keyboard)
-
-@dp.callback_query(F.data == "pagination_forward")
-async def pagination_forward(callback: types.CallbackQuery, state: FSMContext):
-    data = await state.get_data()
-    await state.set_data({
-        "page": data["page"] + 1
-    })
-    keyboard = get_pagination_keyboard(data["page"] + 1)
-    await callback.message.edit_text("Список чатов", reply_markup=keyboard)
-
-@dp.callback_query(F.data == "nothing")
-async def Noting(callback: types.CallbackQuery, state: FSMContext):
-    # just nothing
-    pass
-
 @dp.callback_query(F.data == "create_product")
 async def create_product(callback: types.CallbackQuery, state: FSMContext):
     await state.set_state(StatesForCreate.product_name)
@@ -380,6 +317,15 @@ async def register_basket(callback: types.CallbackQuery, state: FSMContext):
     })
     await state.set_data(data)
     await state.set_state(StatesForRegBasket.name)
+
+@dp.callback_query(F.data == "send_contact")
+async def send_contact(callback: types.CallbackQuery):
+    await callback.message.bot.send_contact(
+        chat_id= callback.from_user.id,
+        phone_number="+79887485869",
+        first_name="Ilya",
+        last_name="Nikitin"
+    )
 
 @callback_router.callback_query()
 async def handle_unknown_callback(callback: types.CallbackQuery, state: FSMContext):

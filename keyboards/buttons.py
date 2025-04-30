@@ -21,7 +21,7 @@ class InlineButton(Button):
         self.callback_data = callback_data
 
     def create(self) -> InlineKeyboardButton:
-        print(f"[{self.text}:{self.callback_data}]")
+        # print(f"[{self.text}:{self.callback_data}]")
         return InlineKeyboardButton(text=self.text, callback_data=self.callback_data)
 
 
