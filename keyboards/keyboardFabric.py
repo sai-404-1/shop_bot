@@ -98,10 +98,10 @@ def createPaginationKeyboard(items: list[InlineButton], page: int, page_size: in
         keyboard.row(item.create())
     last_row = []
     if page != 0: last_row.append(InlineButton("<-", "pagination_back").create())
-    else: last_row.append(InlineButton("/", "nothing").create())
-    last_row.append(InlineButton(f"{page + 1}", "nothing").create())
+    else: last_row.append(InlineButton("/-", "nothing").create())
+    last_row.append(InlineButton(f"{page + 1}/{int(items_size/page_size) + 1}", "nothing").create())
     if items_size > page_size * (page + 1): last_row.append(InlineButton("->", "pagination_forward").create())
-    else: last_row.append(InlineButton("/", "nothing").create())
+    else: last_row.append(InlineButton("-/", "nothing").create())
     keyboard.row(*last_row)
     keyboard.row(InlineButton("Меню", "main").create())
     return keyboard.as_markup()

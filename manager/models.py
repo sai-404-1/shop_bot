@@ -50,10 +50,4 @@ class TextContent(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     name_en = Column(String, nullable=False)
     text_content = Column(Text, nullable=False)
-
-class Communication(Base):
-    __tablename__ = "communication"
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    user_id = Column(Integer, ForeignKey("users.user_id"), nullable=False)
-    messages = Column(String, default="[]")
-    readed = Column(Boolean, default=True)
+    

@@ -1,6 +1,6 @@
 from starter import *
 
-from aiogram.utils.keyboard import InlineKeyboardMarkup
+from aiogram.utils.keyboard import InlineKeyboardMarkup, ReplyKeyboardBuilder, InlineKeyboardBuilder
 
 from .buttons import *
 import keyboards.buttons as button_types
@@ -280,7 +280,11 @@ async def manager(callback: types.CallbackQuery, state: FSMContext):
     keyboard.row(InlineKeyboardButton(text="Telegram", url="https://t.me/jxc_kmp"))
     keyboard.row(InlineKeyboardButton(text="Связаться по номеру", callback_data="send_contact"))
     keyboard.row(InlineKeyboardButton(text="Назад", callback_data="main"))
-    await message.answer(text="Выберете средство связи", reply_markup=keyboard.as_markup())
+    await bot.delete_message(
+            chat_id=callback.from_user.id,
+            message_id=callback.message.message_id    
+        )
+    await callback.message.answer(text="Выберете средство связи", reply_markup=keyboard.as_markup())
 
 # admin functions
 @dp.callback_query(F.data == "create_product")
