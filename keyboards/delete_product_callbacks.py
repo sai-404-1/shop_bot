@@ -1,5 +1,6 @@
 from starter import *
 from keyboards.keyboardFabric import *
+from .callbacks import get_pagination_keyboard
 
 @dp.callback_query(F.data == "delete_product")
 async def change_products(callback: types.CallbackQuery, state: FSMContext):
@@ -14,6 +15,13 @@ async def change_products(callback: types.CallbackQuery, state: FSMContext):
             not_sorted.append(type)
 
     sorted_array = sorted(not_sorted, key=lambda x: x.rate, reverse=True)
+    await state.set_data({
+        "isBasket": False,
+        "page": 0,
+        "type_id": type.id,
+        "cd": callback.data,
+        "pagination_template": "changeProductWithType__",
+    })
     await callback.message.edit_text(
         text="Выберите тип товара (перечислены в соответствии с частотой использования и существующими товарами)",
         reply_markup=keyboardFabric.createKeyboardWithBackButton([
@@ -23,15 +31,19 @@ async def change_products(callback: types.CallbackQuery, state: FSMContext):
 @dp.callback_query(F.data.startswith('deleteProductWithType'))
 async def delete_product_with_type(callback: types.CallbackQuery, state: FSMContext):
     data = callback.data.split('__')
-    products = CRUD.for_model(Product).get(db_session, type_id=int(data[1]))
     type = CRUD.for_model(Type).get(db_session, id=int(data[1]))[0]
+    await state.set_data({
+        "isBasket": False,
+        "page": 0,
+        "type_id": type.id,
+        "cd": callback.data,
+        "pagination_template": "deleteProduct__",
+    })
+    keyboard = get_pagination_keyboard(0, type.id, "deleteProduct__")
     CRUD.for_model(Type).update(db_session, model_id=type.id, rate=type.rate+1)
     await callback.message.edit_text(
         text=f"Выберите продукт из категории {type.title} <b>для удаления</b>",
-        reply_markup=keyboardFabric.createKeyboardWithBackButton(
-            [InlineButton(text=f"{product.name}", callback_data=f'deleteProduct__{product.id}') for product in products],
-            "admin_menu_products"
-        ),
+        reply_markup=keyboard,
         parse_mode='HTML'
     )
 
