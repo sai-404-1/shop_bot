@@ -76,13 +76,13 @@ async def check_for_admin(callback: types.CallbackQuery, state: FSMContext):
     else: await send_generated_message(callback)
 
 # TODO: 
-def get_pagination_keyboard(page: int, type_id: int) -> InlineKeyboardMarkup:
+def get_pagination_keyboard(page: int, type_id: int, template: str) -> InlineKeyboardMarkup:
     products = CRUD.for_model(Product).get(db_session, type_id=type_id)
     buttons = []
     for product in products:
         buttons.append(
             InlineButton(
-                product.name, f"product__{product.id}"
+                product.name, f"{template}{product.id}"
             )
         )
 
@@ -95,9 +95,10 @@ async def pagination_back(callback: types.CallbackQuery, state: FSMContext):
     await state.set_data({
         "page": data["page"] - 1,
         "type_id": data["type_id"],
-        "cd": data["cd"]
+        "cd": data["cd"],
+        "pagination_template": data["pagination_template"],
     })
-    keyboard = get_pagination_keyboard(data["page"] - 1, data["type_id"])
+    keyboard = get_pagination_keyboard(data["page"] - 1, data["type_id"], data["pagination_template"])
     tg = messageGenerator.TextGenerator(data["cd"])
     await callback.message.edit_text(tg.getMessagePart(), reply_markup=keyboard)
 
@@ -108,9 +109,10 @@ async def pagination_forward(callback: types.CallbackQuery, state: FSMContext):
     await state.set_data({
         "page": data["page"] + 1,
         "type_id": data["type_id"],
-        "cd": data["cd"]
+        "cd": data["cd"],
+        "pagination_template": data["pagination_template"],
     })
-    keyboard = get_pagination_keyboard(data["page"] + 1, data["type_id"])
+    keyboard = get_pagination_keyboard(data["page"] + 1, data["type_id"], data["pagination_template"])
     tg = messageGenerator.TextGenerator(data["cd"])
     await callback.message.edit_text(tg.getMessagePart(), reply_markup=keyboard)
 
@@ -149,7 +151,7 @@ async def product_type_handler(callback: types.CallbackQuery, state: FSMContext)
 
     # TODO: Change
     type_id = CRUD.for_model(Type).get(db_session, name=callback.data)[0].id
-    keyboard = get_pagination_keyboard(0, type_id)
+    keyboard = get_pagination_keyboard(0, type_id, "product__")
 
     if callback.message.photo:
         await callback.message.delete()
@@ -162,7 +164,8 @@ async def product_type_handler(callback: types.CallbackQuery, state: FSMContext)
         "isBasket": False,
         "page": 0,
         "type_id": type_id,
-        "cd": callback.data
+        "cd": callback.data,
+        "pagination_template": "product__" 
     })
 
 @dp.callback_query(F.data.startswith("product"))
