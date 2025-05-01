@@ -34,6 +34,13 @@ async def change_products(callback: types.CallbackQuery, state: FSMContext):
 async def change_product_with_type(callback: types.CallbackQuery, state: FSMContext):
     data = callback.data.split('__')
     type = CRUD.for_model(Type).get(db_session, id=int(data[1]))[0]
+    await state.set_data({
+        "isBasket": False,
+        "page": 0,
+        "type_id": type.id,
+        "cd": callback.data,
+        "pagination_template": "changeProduct__",
+    })
     CRUD.for_model(Type).update(db_session, model_id=type.id, rate=type.rate+1)
     keyboard = get_pagination_keyboard(0, type.id, "changeProduct__")
     await callback.message.edit_text(
