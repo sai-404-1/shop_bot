@@ -80,6 +80,7 @@ async def cmd_start(message: Message):
 
 @dp.message(Command("admin"))
 async def cmd_basket(message: Message, state: FSMContext):
+    await state.clear()
     user = CRUD.for_model(Users).get(db_session, user_id=message.from_user.id)[0]
     print(user, user.role, user.username)
     if user.role >= 1: 
