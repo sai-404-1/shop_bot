@@ -35,9 +35,18 @@ async def type_update_product(callback: types.CallbackQuery, state: FSMContext):
     await callback.message.answer(await get_message(product), parse_mode="HTML")
     await state.clear()
 
-@fsm_router.message(StatesForUpdate.product_photo)
+@dp.callback_query(F.data.startswith('changedPhotoProduct'))
+async def photo_update_product(callback: types.CallbackQuery, state: FSMContext):
+    data = await state.get_data()
+    data.update({"choice_photo_number": int(callback.data.split("__")[1]) - 1})
+    await state.set_data(data)
+    await state.set_state(StatesForUpdate.single_photo_handler)
+    await callback.message.edit_text("Отправьте новую фотографию для продукта")
+
+@fsm_router.message(StatesForUpdate.single_photo_handler)
 async def photo_update_product(message: Message, state: FSMContext):
     data = await state.get_data()
+
     product = CRUD.for_model(Product).get(db_session, id=int(data.get('current_changed_product_id')))[0]
     current_message = await message.answer('Скачиваю...')
     file_id = message.photo[-1].file_id
@@ -46,8 +55,25 @@ async def photo_update_product(message: Message, state: FSMContext):
         file_path=file.file_path,
         destination=f"src/photo/{file_id}.jpg"
     )
+
+    if data.get("choice_photo_number") != None:
+        product.photo[data["choice_photo_number"]] = f"{file_id}.jpg"
+    else:
+        product.photo[0] = f"{file_id}.jpg"
+
     await current_message.edit_text(f"Файл: {file_id[:10]}...")
-    CRUD.for_model(Product).update(db_session, model_id=product.id, photo=f"{file_id}.jpg")
+
+    CRUD.for_model(Product).delete(db_session, model_id=product.id)
+    CRUD.for_model(Product).create(
+        db_session,
+        id=product.id,
+        name=product.name,
+        description=product.description,
+        photo=product.photo,
+        price=product.price,
+        type_id=product.type_id,
+        quantity=product.quantity
+    )    
     await message.answer(await get_message(product), parse_mode="HTML")
     await current_message.delete()
     await state.clear()

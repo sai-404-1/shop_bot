@@ -7,7 +7,7 @@ class StatesForCreate(StatesGroup):
     product_price = State()
     multiple_photos_handler = State()
     single_photo_handler = State()
-    product_photo = State()
+    product_photo = State()         # Кажется нигде не используется
     product_type = State()
     product_quantity = State()
 
@@ -15,7 +15,8 @@ class StatesForUpdate(StatesGroup):
     product_name = State()
     product_description = State()
     product_price = State()
-    product_photo = State()
+    multiple_photos_handler = State()
+    single_photo_handler = State()
     product_type = State()
     product_quantity = State()
 

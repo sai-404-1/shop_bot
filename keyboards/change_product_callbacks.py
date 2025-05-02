@@ -116,13 +116,30 @@ async def change_product(callback: types.CallbackQuery, state: FSMContext):
         )
 
     elif "photo" in data[0].lower():
-        await state.set_state(StatesForUpdate.product_photo)
-        await callback.message.answer(
-            text="Отправьте новую фотографию для продукта",
-            reply_markup=keyboardFabric.createCustomInlineKeyboard([
+        product = CRUD.for_model(Product).get(db_session, id=int(data[1]))
+        
+        data = await state.get_data()
+        data.update({"current_changed_product_id": product[0].id})
+        await state.set_data(data)
+
+        if len(product[0].photo) == 1:
+            await state.set_state(StatesForUpdate.single_photo_handler)
+            await callback.message.answer(
+                text="Отправьте новую фотографию для продукта",
+                reply_markup=keyboardFabric.createCustomInlineKeyboard([
+                    InlineButton(text="Отменить действие", callback_data="cancel_task")
+                ]),
+            )
+        else:
+            buttons = [InlineButton(text=str(i), callback_data="changedPhotoProduct__" + str(i)) for i in range(1, len(CRUD.for_model(Product).get(db_session, id=product[0].id)[0].photo) + 1)]
+            buttons.append(
                 InlineButton(text="Отменить действие", callback_data="cancel_task")
-            ]),
-        )
+            )
+            await callback.message.answer(
+                text=f'У <a href="{await create_start_link(bot, str(product[0].id))}">данного продукта</a> несколько фотографий. Выберите номер фотографии для изменения',
+                reply_markup=keyboardFabric.createCustomInlineKeyboard(buttons),
+                parse_mode="HTML"
+            )
 
 
 @dp.callback_query(F.data == "cancel_task")
