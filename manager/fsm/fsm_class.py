@@ -5,6 +5,8 @@ class StatesForCreate(StatesGroup):
     product_name = State()
     product_description = State()
     product_price = State()
+    multiple_photos_handler = State()
+    single_photo_handler = State()
     product_photo = State()
     product_type = State()
     product_quantity = State()
