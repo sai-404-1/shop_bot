@@ -14,6 +14,7 @@ from starter import *
 
 @dp.message(CommandStart(deep_link=True))
 async def cmd_start_arguments(message: Message, command: CommandObject, state: FSMContext):
+    await state.clear()
     product = CRUD.for_model(Product).get(db_session, id=int(command.args))[0]
     maxQuantity = product.quantity
     await state.set_data({
@@ -52,7 +53,8 @@ async def cmd_start_arguments(message: Message, command: CommandObject, state: F
 
 
 @dp.message(CommandStart())
-async def cmd_start(message: Message):
+async def cmd_start(message: Message, state: FSMContext):
+    await state.clear()
     dataset = Json.getMainDataset()
 
     # We are creating a new user if that not be was before
