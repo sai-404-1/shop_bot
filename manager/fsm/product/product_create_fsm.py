@@ -112,16 +112,6 @@ async def multiple_photos_handler(callback: types.CallbackQuery, state: FSMConte
     await state.set_state(StatesForCreate.multiple_photos_handler)
 
 
-# single_photo_handler
-#@dp.callback_query(F.data == "once_photo")
-#async def photo_getter(photo):
-#    file_id = photo.file_id
-#    file = await bot.get_file(file_id)
-#
-#    await bot.download_file(
-#        file_path=file.file_path,
-#        destination=f"src/photo/{file_id}.jpg"
-#    )
 
 @fsm_router.message(StatesForCreate.single_photo_handler)
 async def message_try(message: Message, state: FSMContext, bot: Bot):
