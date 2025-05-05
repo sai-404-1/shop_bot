@@ -170,62 +170,90 @@ async def product_type_handler(callback: types.CallbackQuery, state: FSMContext)
 
 @dp.callback_query(F.data.startswith("product"))
 async def process_callback(callback: types.CallbackQuery, state: FSMContext):
+    # Извлекаем product_id из callback.data
+    try:
+        product_id = int(callback.data.split("__")[1])
+    except (IndexError, ValueError):
+        await callback.answer("Некорректный формат данных.")
+        return
+
+    # Получаем текущее состояние
     data = await state.get_data()
-    product = CRUD.for_model(Product).get(db_session, id=int(callback.data.split("__")[1]))
-    if product is None or (len(product) == 0): 
-        callback.answer("Данная позиция уже выкуплена")
-        if data.get("isBasket") == False:
+
+    # Получаем товар
+    product_list = CRUD.for_model(Product).get(db_session, id=product_id)
+    if not product_list:
+        await callback.answer("Данная позиция уже выкуплена")
+        if not data.get("isBasket"):
             await cmd_start(callback, state)
         else:
-            # TODO: delete all positions from basket with int(callback.data.split("__")[1]) == product.id
+            # TODO: удалить из корзины позицию с product_id
             await basket(callback, state)
         return
-    product = product[0]
-    # Список фотографий для отправки
-    media = []
-    for photo in product.photo:
-        media.append(
-            InputMediaPhoto(media=FSInputFile(f"{photo_path}/{photo}"))  # Используем FSInputFile для локальных файлов
-        )
 
-    if data.get("isBasket") == False:
-        buttons = []
-        maxQuantity = product.quantity
+    product = product_list[0]
+
+    # Готовим фотографии
+    media = []
+    if product.photo:
+        for photo in product.photo:
+            media.append(InputMediaPhoto(media=FSInputFile(f"{photo_path}/{photo}")))
+
+    # Обработка состояния: из корзины или нет
+    if not data.get("isBasket"):
+        max_quantity = product.quantity
+
         await state.set_data({
             "productId": product.id,
             "currQuantity": 1,
-            "maxQuantity": maxQuantity
+            "maxQuantity": max_quantity
         })
+
         keyboard = await keyboardFabric.createBeforeBasketKeyboard(state)
     else:
-        basket_position = CRUD.for_model(Basket).get(db_session, user_id=callback.from_user.id, products_id=product.id)
-        if basket_position is None  or (len(basket_position) == 0):
-            callback.answer("Данная позиция уже выкуплена")
-            # TODO: delete all positions from basket with int(callback.data.split("__")[1]) == product.id
+        basket_position_list = CRUD.for_model(Basket).get(
+            db_session,
+            user_id=callback.from_user.id,
+            products_id=product.id
+        )
+        if not basket_position_list:
+            await callback.answer("Данная позиция уже выкуплена")
+            # TODO: удалить из корзины позицию с product_id
             await basket(callback, state)
             return
-        basket_position = basket_position[0]
+
+        basket_position = basket_position_list[0]
+
         await state.set_data({
             "isBasket": True,
             "productId": product.id,
             "currQuantity": basket_position.quantity,
             "maxQuantity": product.quantity
         })
-        keyboard = await keyboardFabric.createProductFromBasketKeyboard(state)
-        # TODO: add this
-        pass
 
+        keyboard = await keyboardFabric.createProductFromBasketKeyboard(state)
+
+    # Удаление старого сообщения
     await callback.message.delete()
+
+    # Отправка медиа-группы
     sent_messages = await callback.message.answer_media_group(media=media)
-    data = await state.get_data()
-    data.update({"for_delete": [[msg.chat.id, msg.message_id] for msg in sent_messages]})
-    await state.set_data(data)
+
+    # Сохраняем список сообщений для удаления
+    new_data = await state.get_data()
+    new_data["for_delete"] = [[msg.chat.id, msg.message_id] for msg in sent_messages]
+    await state.set_data(new_data)
+
+    # Отправка описания товара
+    product_text = text.insert_after_first_line(product.name, f"Цена: {product.price}₽")
+    product_link = await create_start_link(bot, str(product.id))
 
     await callback.message.answer(
-        "{}\n\n[Ссылка на товар]({})".format(text.insert_after_first_line(product.name, f"Цена: {product.price}₽"), await create_start_link(bot, str(product.id))),
+        f"{product_text}\n\n[Ссылка на товар]({product_link})",
         reply_markup=keyboard,
         parse_mode="Markdown"
     )
+
 
 @dp.callback_query(
     F.data == "changeQuantity"

@@ -16,10 +16,15 @@ async def show_basket(user_id: int, state: FSMContext, message: Message | types.
     text = ""
     
     for basket_position in basket:
-        product = CRUD.for_model(Product).get(db_session, id=basket_position.products_id)[0]
-        quantity = basket_position.quantity
-        buttons.append(InlineButton(product.name, str(product.id)))
-        text += f"Товар: {product.name} \nКол-во: {quantity}\n\n"
+        product = CRUD.for_model(Product).get(db_session, id=basket_position.products_id)
+        if len(product) < 1:
+            CRUD.for_model(Basket).delete(db_session, model_id=basket_position.id)
+            print(f"Product with id {basket_position.products_id} doesn't exist")
+        else:
+            quantity = basket_position.quantity
+            buttons.append(InlineButton(product[0].name, str(product[0].id)))
+            text += f"Товар: {product[0].name} \nКол-во: {quantity}\n\n"
+
 
     await state.set_data({"isBasket": True})
     keyboard = keyboardFabric.createCustomInlineKeyboard([

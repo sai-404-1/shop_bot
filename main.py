@@ -14,7 +14,7 @@ from starter import *
 
 @dp.message(CommandStart(deep_link=True))
 async def cmd_start_arguments(message: Message, command: CommandObject, state: FSMContext):
-    await state.clear()
+    # await state.clear()
     product = CRUD.for_model(Product).get(db_session, id=int(command.args))[0]
     maxQuantity = product.quantity
     # await state.set_data({
