@@ -20,9 +20,9 @@ async def buttons_header(message: Message, state: FSMContext):
     
     elif message.text == "Связь с менеджером":
         keyboard = InlineKeyboardBuilder()
-        keyboard.row(InlineKeyboardButton(text="WhatsApp", url="https://wa.me/79887485869"))
-        keyboard.row(InlineKeyboardButton(text="Telegram", url="https://t.me/jxc_kmp"))
-        keyboard.row(InlineKeyboardButton(text="Связаться по номеру", callback_data="send_contact"))
+        keyboard.row(InlineKeyboardButton(text="WhatsApp", url="https://wa.me/79624433666"))
+        keyboard.row(InlineKeyboardButton(text="Telegram", url="https://t.me/Multiphone_stav1"))
+        keyboard.row(InlineKeyboardButton(text="Связь с менеджером", callback_data="send_contact"))
         keyboard.row(InlineKeyboardButton(text="Назад", callback_data="main"))
         await message.answer(text="Выберете средство связи", reply_markup=keyboard.as_markup())
 

@@ -307,9 +307,9 @@ async def remove_from_basket(callback: types.CallbackQuery, state: FSMContext):
 @dp.callback_query(F.data == "manager")
 async def manager(callback: types.CallbackQuery, state: FSMContext):
     keyboard = InlineKeyboardBuilder()
-    keyboard.row(InlineKeyboardButton(text="WhatsApp", url="https://wa.me/79887485869"))
-    keyboard.row(InlineKeyboardButton(text="Telegram", url="https://t.me/jxc_kmp"))
-    keyboard.row(InlineKeyboardButton(text="Связаться по номеру", callback_data="send_contact"))
+    keyboard.row(InlineKeyboardButton(text="WhatsApp", url="https://wa.me/79624433666"))
+    keyboard.row(InlineKeyboardButton(text="Telegram", url="https://t.me/Multiphone_stav1"))
+    keyboard.row(InlineKeyboardButton(text="Связь с менеджером", callback_data="send_contact"))
     keyboard.row(InlineKeyboardButton(text="Назад", callback_data="main"))
     await bot.delete_message(
             chat_id=callback.from_user.id,
@@ -357,9 +357,9 @@ async def register_basket(callback: types.CallbackQuery, state: FSMContext):
 async def send_contact(callback: types.CallbackQuery):
     await callback.message.bot.send_contact(
         chat_id= callback.from_user.id,
-        phone_number="+79887485869",
-        first_name="Ilya",
-        last_name="Nikitin"
+        phone_number="+79624433666",
+        first_name="Менеджер",
+        last_name=""
     )
 
 @callback_router.callback_query()
