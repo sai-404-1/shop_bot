@@ -245,7 +245,8 @@ async def process_callback(callback: types.CallbackQuery, state: FSMContext):
     await state.set_data(new_data)
 
     # Отправка описания товара
-    product_text = text.insert_after_first_line(product.name, f"Цена: {product.price}₽")
+    product_text = product.name
+    # product_text = text.insert_after_first_line(product.name, f"Цена: {product.price}₽")
     product_link = await create_start_link(bot, str(product.id))
 
     await callback.message.answer(

@@ -42,7 +42,10 @@ async def cmd_start_arguments(message: Message, command: CommandObject, state: F
     await message.delete()
 
     await message.answer(
-        "{}\n\n[Ссылка на товар]({})".format(fastFunctions.text.insert_after_first_line(product.name, f"Цена: {product.price}₽"), await create_start_link(bot, str(product.id))),
+        "{}\n\n[Ссылка на товар]({})".format(
+            # fastFunctions.text.insert_after_first_line(product.name, f"Цена: {product.price}₽"), 
+            product.name,
+            await create_start_link(bot, str(product.id))),
         reply_markup=keyboard,
         parse_mode="Markdown"
     )
