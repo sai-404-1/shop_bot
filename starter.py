@@ -15,8 +15,8 @@ from myUtils.fastFunctions.photo_service import MediaGroupMiddleware
 
 # Инициализация бота и диспетчера
 # TOKEN = "8189724684:AAFEEBUKaYrGwqoCBsWH5qE_HsdaTwygT1U" 
-TOKEN = "8192189600:AAGBp3jHPZnykrMTQAikHFTxA57QOAmnGNg"
-# TOKEN = "7816677166:AAF_ppIzs1oPRV3-agwb5Xeb8sVGX-3fm1o"
+# TOKEN = "8192189600:AAGBp3jHPZnykrMTQAikHFTxA57QOAmnGNg"
+TOKEN = "7816677166:AAF_ppIzs1oPRV3-agwb5Xeb8sVGX-3fm1o"
 # TOKEN = "7543943279:AAG20NNnPm-SIOjVB43rbdHM_w4Gx8usEFM" #manager.get_token()
 db_session = Database('src/database.db').Session()
 photo_path = "src/photo"

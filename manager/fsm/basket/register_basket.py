@@ -62,9 +62,13 @@ async def message_try(message: Message, state: FSMContext):
     
     text = ""
     for basket_position in basket:
-        product = CRUD.for_model(Product).get(db_session, id=basket_position.products_id)[0]
-        quantity = basket_position.quantity
-        text += f'<a href="{await create_start_link(bot, str(product.id))}">{product.name}</a> \nКол-во: {quantity}\n\n'
+        product = CRUD.for_model(Product).get(db_session, id=basket_position.products_id)
+        if len(product) < 1:
+            CRUD.for_model(Basket).delete(db_session, model_id=basket_position.id)
+            print(f"Product with id {basket_position.products_id} doesn't exist")
+        else:
+            quantity = basket_position.quantity
+            text += f'<a href="{await create_start_link(bot, str(product[0].id))}">{product[0].name}</a> \nКол-во: {quantity}\n\n'
 
     await bot.send_message(
         # chat_id=7594389667,
