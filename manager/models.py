@@ -33,8 +33,9 @@ class Product(Base):
     name = Column(String, nullable=False)
     description = Column(String, nullable=False)
     photo = Column(JSON, nullable=True)
-    price = Column(String, nullable=False)
+    price = Column(String, nullable=True)
     type_id = Column(Integer, ForeignKey("type.id"), nullable=True)
+    category_id = Column(Integer, ForeignKey("category.id"), nullable=True)
     quantity = Column(Integer, default=1)
 
 class Type(Base):
@@ -44,6 +45,12 @@ class Type(Base):
     title = Column(String, nullable=False)
     description = Column(String, nullable=False)
     rate = Column(Integer, nullable=True, default=0)
+
+class Category(Base):
+    __tablename__ = "category"
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    name = Column(String, nullable=False)
+    btn_link = Column(String, nullable=False, unique=True)
 
 class TextContent(Base):
     __tablename__ = "texts"

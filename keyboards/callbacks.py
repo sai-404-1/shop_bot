@@ -75,9 +75,19 @@ async def check_for_admin(callback: types.CallbackQuery, state: FSMContext):
     if user.role < 1: await callback.message.delete()
     else: await send_generated_message(callback)
 
-# TODO: 
-def get_pagination_keyboard(page: int, type_id: int, template: str) -> InlineKeyboardMarkup:
-    products = CRUD.for_model(Product).get(db_session, type_id=type_id)
+# TODO: перенести логику в отдельный файл
+def get_pagination_keyboard(
+            page: int,
+            type_id: int = 0,
+            category_id: int = None,
+            template: str = "example__"
+        ) -> InlineKeyboardMarkup:
+
+    if type_id > 0:
+        products = CRUD.for_model(Product).get(db_session, type_id=type_id)
+    elif category_id != None:
+        products = CRUD.for_model(Product).get(db_session, category_id=category_id)
+    
     buttons = []
     for product in products:
         buttons.append(
@@ -95,10 +105,11 @@ async def pagination_back(callback: types.CallbackQuery, state: FSMContext):
     await state.set_data({
         "page": data["page"] - 1,
         "type_id": data["type_id"],
+        "category_id": data.get("category_id"),
         "cd": data["cd"],
         "pagination_template": data["pagination_template"],
     })
-    keyboard = get_pagination_keyboard(data["page"] - 1, data["type_id"], data["pagination_template"])
+    keyboard = get_pagination_keyboard(data["page"] - 1, data["type_id"], data.get("category_id"), data["pagination_template"])
     tg = messageGenerator.TextGenerator(data["cd"])
     await callback.message.edit_text(tg.getMessagePart(), reply_markup=keyboard)
 
@@ -109,10 +120,11 @@ async def pagination_forward(callback: types.CallbackQuery, state: FSMContext):
     await state.set_data({
         "page": data["page"] + 1,
         "type_id": data["type_id"],
+        "category_id": data.get("category_id"),
         "cd": data["cd"],
         "pagination_template": data["pagination_template"],
     })
-    keyboard = get_pagination_keyboard(data["page"] + 1, data["type_id"], data["pagination_template"])
+    keyboard = get_pagination_keyboard(data["page"] + 1, data["type_id"], data.get("category_id"), data["pagination_template"])
     tg = messageGenerator.TextGenerator(data["cd"])
     await callback.message.edit_text(tg.getMessagePart(), reply_markup=keyboard)
 
@@ -151,22 +163,88 @@ async def product_type_handler(callback: types.CallbackQuery, state: FSMContext)
 
     # TODO: Change
     type_id = CRUD.for_model(Type).get(db_session, name=callback.data)[0].id
-    keyboard = get_pagination_keyboard(0, type_id, "product__")
-
-    if callback.message.photo:
-        await callback.message.delete()
-        await callback.message.answer(tg.getMessagePart(), reply_markup=keyboard)
-    else:
-        await callback.message.edit_text(tg.getMessagePart(), reply_markup=keyboard)
     
+    # Поиск товаров по типу
+    products = CRUD.for_model(Product).get(db_session, type_id=type_id)
+
+    categories = {}
+    product_without_type = []
+    product_with_type = []
+    for product in products:
+        if product.category_id != None:
+            category = CRUD.for_model(Category).get(db_session, id=product.category_id)[0]
+            product_with_type.append(category.id) if category.id not in product_with_type else ...
+            categories.update({"sorted": product_with_type})
+        else:
+            product_without_type.append(product.id)
+            categories.update({"not_sorted": product_without_type})
+
+    buttons = []
+
+    if categories.get("sorted") != None:
+        for category_in in categories["sorted"]:
+            category = CRUD.for_model(Category).get(db_session, id=category_in)[0]
+            buttons.append(InlineButton(
+                category.name, f"category__{category.id}"
+            ))
+        if categories.get("not_sorted") != None:
+            buttons.append(InlineButton(
+                f"Не сортированные ({len(categories.get("not_sorted"))})",
+                f"category__{type_id}__01" # 01 - для будущей проверки
+            ))
+        await callback.message.edit_text(
+            tg.getMessagePart(),
+            reply_markup=keyboardFabric.createCustomInlineKeyboard(buttons)
+        )
+    else:
+        keyboard = get_pagination_keyboard(0, type_id, "product__")
+        if callback.message.photo:
+            await callback.message.delete()
+            await callback.message.answer(tg.getMessagePart(), reply_markup=keyboard)
+        else:
+            await callback.message.edit_text(tg.getMessagePart(), reply_markup=keyboard)
+
     await state.clear()
     await state.set_data({
         "isBasket": False,
         "page": 0,
         "type_id": type_id,
         "cd": callback.data,
-        "pagination_template": "product__" 
+        "pagination_template": "product__"
     })
+
+
+@dp.callback_query(F.data.startswith("category__"))
+async def category_handler(callback: types.CallbackQuery, state: FSMContext):
+    callback_data = callback.data.split("__")
+    type_id = 0
+    category_id = 0
+
+    # Если выбраны не сортированные товары (01)
+    if callback_data[-1] == "01":
+        type_id = int(callback_data[-2])
+        keyboard = get_pagination_keyboard(0, type_id=type_id, template="product__")
+    else:
+        category_id = int(callback_data[1])
+        keyboard = get_pagination_keyboard(0, category_id=category_id, template="product__")
+    
+    await state.set_data({
+        "page": 0,
+        "type_id":type_id,
+        "category_id": category_id,
+        "cd": callback.data,
+        "pagination_template": "product__",
+    })
+
+    # TODO Добавить сохранение названия категории.
+    # Сейчас TextGenerator ориентируется на category__* и возвращает Not a message 
+    tg = messageGenerator.TextGenerator(callback.data)
+    if callback.message.photo:
+        await callback.message.delete()
+        await callback.message.answer(tg.getMessagePart(), reply_markup=keyboard)
+    else:
+        await callback.message.edit_text(tg.getMessagePart(), reply_markup=keyboard)
+
 
 @dp.callback_query(F.data.startswith("product"))
 async def process_callback(callback: types.CallbackQuery, state: FSMContext):

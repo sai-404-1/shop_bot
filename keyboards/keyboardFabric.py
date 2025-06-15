@@ -22,7 +22,6 @@ def createCustomInlineKeyboard(buttons: list[Button]) -> InlineKeyboardMarkup:
     for buttonData in buttons:
         button = buttonData.create()
         keyboard.row(button)
-    # print(keyboard)
     return keyboard.as_markup()
 
 def createCustomReplyKeyboard(buttons: list[list[Button]]) -> ReplyKeyboardMarkup:
@@ -58,7 +57,7 @@ async def createBeforeBasketKeyboard(state: FSMContext) -> InlineKeyboardMarkup:
     typeId = product.type_id
     productType = CRUD.for_model(Type).get(db_session, id=typeId)[0]
     backAction = productType.name
-    print(f"BACK ACTION: {backAction}")
+    print(f"BACK ACTION: {str(backAction)[:24]}")
 
     return createKeyboardWithBackButton(buttons, backAction)
 
@@ -90,7 +89,9 @@ def get_page(arr: list, page: int, page_size: int) -> list:
     if len(arr) < (page + 1) * page_size: return arr[page * page_size:]
     return arr[page * page_size: (page + 1) * page_size]
 
-def createPaginationKeyboard(items: list[InlineButton], page: int, page_size: int = 10) -> InlineKeyboardMarkup:
+# Для теста пагинации на категориях
+# TODO вернуть 10 перед заливом
+def createPaginationKeyboard(items: list[InlineButton], page: int, page_size: int = 5) -> InlineKeyboardMarkup:
     keyboard = InlineKeyboardBuilder()
     items_size = len(items)
     items = get_page(items, page, page_size)

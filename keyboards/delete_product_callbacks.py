@@ -11,7 +11,6 @@ async def change_products(callback: types.CallbackQuery, state: FSMContext):
     not_sorted = []
     for type in types:
         if type.id in product_exist_type_id:
-            print(type.title)
             not_sorted.append(type)
 
     sorted_array = sorted(not_sorted, key=lambda x: x.rate, reverse=True)

@@ -5,6 +5,8 @@ manager/db_test.py
 *.png
 *.jpg
 *.db
+finder.py
+total_lines.py
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
